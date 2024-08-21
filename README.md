@@ -1,6 +1,6 @@
-#Ideas De Pausibiles Proyectos
+# Ideas De Pausibiles Proyectos
 
-##Ideas Previas
+## Ideas Previas
 Como idea consecuente a un estudio previo:
 **MinApp**
 MinApp una aplicación donde los trabajadores del ámbito de la seguridad podrán encontrar, guardar, modificar y

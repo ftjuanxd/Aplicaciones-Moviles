@@ -1,10 +1,8 @@
-# Ideas De Pausibiles Proyectos
-
-## Ideas Previas
+## Idea de Proyecto
 Como idea consecuente a un estudio previo:
 **MinApp**
 MinApp una aplicación donde los trabajadores del ámbito de la seguridad podrán encontrar, guardar, modificar y
-constancia de seguridad de los sucesos que ocurren en cada puesto de trabajo, permitiendo la virtualización de la
+constancia de los sucesos que ocurren en cada puesto de trabajo, permitiendo la virtualización de la
 información, además de la accesibilidad remota de la misma. Por otro lado, la aplicación se vuelve legible y fácil de
 usar por los Guardas de Seguridad, Supervisores, La Central, entre otros trabajadores involucrados con esta
 información.

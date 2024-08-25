@@ -10,3 +10,20 @@ información.
 **Apps Similares**
 Ubiqo 
 Esta app ofrece lo mismo que mi idea principal, no obstante esta fue creada para un publico general siendo que la mia seria una app especializada para la empresa que la desee comprar, siendo en si la diferencia clave la interfaz del usuario y una que otra funcion dependiendo del cargo o rango de la persona que la empresa decida.
+
+## Descripción de la Aplicación “Minapp”
+
+Minapp es una aplicación diseñada para revolucionar el servicio de seguridad en puestos fijos. Sus funcionalidades clave son:
+
+**Registro Digital:** Reemplaza los tradicionales libros de anotaciones de los guardas de seguridad por una aplicación móvil. Los guardas pueden registrar eventos, incidentes y actividades directamente en la app.
+**Reportes Offline y Online:** Minapp permite a los guardas generar reportes tanto en línea como sin conexión a internet. Esto garantiza que los datos se registren incluso en áreas con mala conectividad.
+Escaneo de Documentos: La función OCR (Reconocimiento Óptico de Caracteres) permite escanear documentos de vehículos o personas. Esto agiliza el proceso de registro y mejora la precisión.
+Supervisión Centralizada: Los supervisores y la central pueden acceder a los reportes de los guardas en tiempo real. Pueden revisar, aprobar y buscar informes por nombre del guarda o puesto de trabajo.
+
+## Tecnología Utilizada:
+
+**Lenguaje de Programación:** Kotlin (desarrollado en Android Studio).
+Tecnología OCR para el escaneo de documentos.
+
+**Ejemplo de Uso:**
+Cuando la empresa de refrigerios llega al colegio donde trabaja el guarda, este puede abrir Minapp, ingresar con su usuario y contraseña, y registrar las personas que ingresan, junto con la autorización y los detalles relevantes. La central o el supervisor pueden revisar los informes en tiempo real para tomar decisiones informadas.

@@ -4,6 +4,7 @@ Los mockups fueron realizados primeramente en Canva y seguido el prototipo en Ma
 ## Login
 
 ![Login](../Img/Login.png)
+
 Depende el del rango de la persona dentro del trabajo lo que se le mostraria seria distinto si es un guarda de seguridad este tendra acceso a los registros, en caso de ser un supervisor o la central estos tendran acceso a los reportes.
 Tras el Login encontraras la siguiente Imagen:
 

@@ -2,9 +2,11 @@
 Los mockups fueron realizados primeramente en Canva y seguido el prototipo en Marvel los recursos a esto lo encontraran al final del documento. En este documento solo se mostraran las pantallas mas importantes el resto las pueden ver en la seccion de recursos. 
 
 ## Login
+
 ![Login](../Img/Login.png)
 Depende el del rango de la persona dentro del trabajo lo que se le mostraria seria distinto si es un guarda de seguridad este tendra acceso a los registros, en caso de ser un supervisor o la central estos tendran acceso a los reportes.
 Tras el Login encontraras la siguiente Imagen:
+
 ![Login](../Img/Home_Screen.png)
 # Acciones del Guarda de Seguridad
 

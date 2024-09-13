@@ -11,24 +11,24 @@ Tras el Login se encontrara con la siguiente Imagen:
 ![Login](../Img/Home_Screen.png)
 ## 2. Acciones del Guarda de Seguridad
 
-  ### - Observations
+  ###   - Observations
   ![Observations](../Img/Observations.png)
-  ### - Pedestrian Access
+  ###   - Pedestrian Access
   ![Access-Text](../Img/Access_Text.png)
   ![Access-ID](../Img/Access_Id.png)
-  ### - Vehicular
+  ###   - Vehicular
   ![Car-Text](../Img/Car_Text.png)
   ![Car-Id](../Img/Car_Id.png)
-  ### - Element
+  ###   - Element
   ![Element-Text](../Img/Elem_Text.png)
   ![Element-ID](../Img/Elem_Id.png)
-  ### - Report
+  ###   - Report
   ![Report](../Img/Report.png)
 
 ## 3. Acciones de Supervisores o Central
-  ### - Search Headquarters
+  ###   - Search Headquarters
   ![Search_Places](../Img/Search_Place.png)
-  ### - Search Employee
+  ###   - Search Employee
   ![Search_Employee](../Img/Search_employee.png)
 
 ## Recursos:

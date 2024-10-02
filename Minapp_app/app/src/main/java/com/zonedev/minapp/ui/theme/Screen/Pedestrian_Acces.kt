@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
+import com.zonedev.minapp.ui.theme.Components.CameraCaptureExample
 import com.zonedev.minapp.ui.theme.Components.CheckHold
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.FieldsThemes
@@ -46,6 +47,8 @@ fun Components_Acces_Scan(){
     var destiny by remember { mutableStateOf("") }
     var auto by remember { mutableStateOf("") }
     var descrip by remember { mutableStateOf("") }
+
+    CameraCaptureExample()
 
     CheckHold()
 

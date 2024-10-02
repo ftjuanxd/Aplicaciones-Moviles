@@ -1,16 +1,20 @@
 package com.zonedev.minapp.ui.theme.Components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +30,8 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -37,6 +43,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -102,7 +110,9 @@ fun CustomTextField(
     @DrawableRes trailingIcon: Int? = null,
     iconTint: Color? = null,
     pdHeight: Dp? = null,
-    modifier: Modifier = Modifier
+    onClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    bitmap: Bitmap? = null // Nuevo parámetro para la imagen capturada
 ) {
     TextField(
         value = value,
@@ -113,11 +123,27 @@ fun CustomTextField(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .border(2.dp, primary, RoundedCornerShape(12.dp))
-            .let { if (pdHeight != null) it.height(pdHeight) else it },
+            .let { if (pdHeight != null) it.height(pdHeight) else it }
+            .clickable {
+                // Solo se ejecuta si onClick no es null
+                onClick?.invoke()
+            },
         keyboardOptions = keyboardOptions,
         trailingIcon = {
-            if (trailingIcon != null) {
-                Icon(painter = painterResource(id = trailingIcon), contentDescription = null, tint = iconTint ?: Color.Black)
+            if (bitmap != null) {
+                // Mostrar la imagen capturada dentro del TextField
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+            } else if (trailingIcon != null) {
+                // Si no hay imagen, mostrar el ícono habitual
+                Icon(
+                    painter = painterResource(id = trailingIcon),
+                    contentDescription = null,
+                    tint = iconTint ?: Color.Black
+                )
             }
         },
         colors = TextFieldDefaults.textFieldColors(
@@ -125,7 +151,8 @@ fun CustomTextField(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             disabledLabelColor = Color.Transparent,
-            containerColor = background
+            containerColor = background,
+            disabledTextColor = MaterialTheme.colorScheme.onSurface // Color predeterminado para texto deshabilitado
         )
     )
 }
@@ -234,9 +261,9 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
 
     Row(
         modifier = Modifier
-            .border(1.dp, color_component, RoundedCornerShape(8.dp))
-            .padding(2.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .border(.5.dp, color_component, RoundedCornerShape(16.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = { selectedButton = 0 }, // Acción de seleccionar Scan Id
@@ -249,7 +276,7 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
                 ButtonDefaults.buttonColors(containerColor = background, contentColor = color_component)
             },
             modifier = Modifier
-                .weight(1f)
+                .weight(2f)//
         ) {
             Text(text = "Scan Id")
         }
@@ -262,7 +289,7 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
                 ButtonDefaults.buttonColors(containerColor = background, contentColor = color_component)
             },
             modifier = Modifier
-                .weight(1f)
+                .weight(2f)
         ) {
             Text(text = "Write")
         }
@@ -283,19 +310,29 @@ fun CheckHold() {
     // Contenedor con el Checkbox y un Text para mostrar el estado
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(end=170.dp)
+        modifier = Modifier.padding(end=190.dp)
     ) {
-        Checkbox(
-            checked = isChecked,
-            onCheckedChange = { isChecked = it }, // Actualiza el estado cuando se hace clic
-            colors = CheckboxDefaults.colors(
-                checkedColor = primary,        // Color cuando está marcado
-                uncheckedColor = background,      // Color cuando está desmarcado
-                checkmarkColor = background,      // Color del check
+        Box(
+            modifier = Modifier
+                .size(23.dp)  // Tamaño del checkbox
+                .border(2.dp, primary, RoundedCornerShape(4.dp))  // Borde personalizado
+                .padding(4.dp)  // Espacio entre el borde y el checkbox
+        ) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = { isChecked = it }, // Actualiza el estado cuando se hace clic
+                colors = CheckboxDefaults.colors(
+                    checkedColor = primary,        // Color cuando está marcado
+                    uncheckedColor = background,      // Color cuando está desmarcado
+                    checkmarkColor = background,      // Color del check
+                )
             )
-        )
+        }
         Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el Checkbox y el texto
-        Text(text = stringResource(R.string.Name_CheckHolder))
+        Text(
+            text = stringResource(R.string.Name_CheckHolder),
+            fontSize = 15.sp
+        )
     }
 }
 
@@ -339,4 +376,36 @@ fun FieldsThemes() {
         pdHeight = 80.dp
     )
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CameraCaptureExample() {
+    val context = LocalContext.current
+    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    // Intent para capturar imagen
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            capturedBitmap = bitmap
+        }
+    }
+    // Custom TextField que muestra la imagen capturada
+    CustomTextField(
+        value = "Scan Id",
+        onValueChange = {},
+        isEnabled = false,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        label = "Upload File",
+        pdHeight = 120.dp,
+        onClick = {
+            // Llamar el intent de captura de foto
+            takePictureLauncher.launch(null)
+        },
+        bitmap = capturedBitmap // Pasar la imagen capturada al TextField
+    )
 }

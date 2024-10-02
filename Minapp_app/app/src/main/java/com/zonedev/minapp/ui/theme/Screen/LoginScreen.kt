@@ -1,6 +1,7 @@
 package com.zonedev.minapp.ui.theme.Screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,25 +26,31 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.bodyFontFamily
+import com.zonedev.minapp.ui.theme.primary
 
 
 // Login Screen
 @Composable
 fun LoginApp() {
-    BlobUi()
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(100.dp))
+        BlobUi()
+        Spacer(modifier = Modifier.height((-20).dp)) // Reduce la altura entre componentes
         CustomLoginScreen()
     }
 }
@@ -49,7 +58,7 @@ fun LoginApp() {
 @Composable
 fun BlobUi() {
     val blob = painterResource(R.drawable.blob)
-    Box {
+    Box(modifier = Modifier.wrapContentHeight()) {
         Image(
             painter = blob,
             contentDescription = null,
@@ -69,7 +78,6 @@ fun BlobUi() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomLoginScreen() {
     var email by remember { mutableStateOf("") }
@@ -84,16 +92,28 @@ fun CustomLoginScreen() {
     ) {
         CustomTextField(
             value = email,
+            label = stringResource(R.string.Label_name_input_user),
             onValueChange = { email = it },
-            label = "Email",
-            isEnabled = true
+            isEnabled = true,
+            KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            R.drawable.user_icon,
+            primary
         )
 
         CustomTextField(
             value = password,
+            label = stringResource(R.string.Label_name_Input_password),
             onValueChange = { password = it },
-            label = "Password",
-            isEnabled = true
+            isEnabled = true,
+            KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+            ),
+            R.drawable.lock_icon,
+            primary
         )
 
         // Usamos ButtonApp en lugar de Button

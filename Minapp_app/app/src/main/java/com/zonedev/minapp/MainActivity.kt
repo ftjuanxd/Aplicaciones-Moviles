@@ -28,6 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.MinappTheme
+import com.zonedev.minapp.ui.theme.Screen.Acces
+import com.zonedev.minapp.ui.theme.Screen.LoginApp
+import com.zonedev.minapp.ui.theme.Screen.MainScreen
+import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
+import com.zonedev.minapp.ui.theme.Screen.Theme_Observations
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.bodyFontFamily
 import com.zonedev.minapp.ui.theme.primary
@@ -40,7 +45,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MinappTheme {
-///
+                Acces()
             }
         }
     }

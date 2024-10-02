@@ -18,51 +18,73 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.Navbar
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.background
 import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(background),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Navbar()
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_user_sample),
-                contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
-                modifier = Modifier
-                    .size(160.dp)
-                    .padding(bottom = 24.dp)
-            )
-
-            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
-
-            CustomTextField(value = "Carlos Cesar Santa Maria", label = "Name", onValueChange = {}, isEnabled = false)
-            CustomTextField(value = "31234567890", label = "Phone", onValueChange = {}, isEnabled = false)
-            CustomTextField(value = "1234567890", label = "N° Id", onValueChange = {}, isEnabled = false)
-            CustomTextField(value = "Male", label = "Genre", onValueChange = {}, isEnabled = false)
-            CustomTextField(value = "O+", label = "Rh", onValueChange = {}, isEnabled = false)
-            CustomTextField(value = "213456789", label = "Code used", onValueChange = {}, isEnabled = false)
-
-            // Usamos ButtonApp aquí también
-            ButtonApp(text = stringResource(R.string.Text_profileScreen_Button),{/*TODO*/})
-        }
-    }
+    BaseScreen(stringResource(R.string.Descripcion_Navbar_Icon_Profile_Screen),R.drawable.notificacion,R.drawable.power_off,
+        {Components_Profile_Screen()},20.sp,40.dp,180.dp)
 }
 
+@Composable
+fun Components_Profile_Screen(){
+    Image(
+        painter = painterResource(id = R.drawable.logo_user_sample),
+        contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
+        modifier = Modifier
+            .size(160.dp)
+            .padding(bottom = 24.dp)
+    )
+
+    Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+
+    CustomTextField(
+        value = "Carlos Cesar Santa Maria",
+        label = "Name",
+        onValueChange = {},
+        isEnabled = false,
+    )
+    CustomTextField(
+        value = "31234567890",
+        label = "Phone",
+        onValueChange = {},
+        isEnabled = false,
+    )
+    CustomTextField(
+        value = "1234567890",
+        label = "N° Id",
+        onValueChange = {},
+        isEnabled = false,
+
+        )
+    CustomTextField(
+        value = "Male",
+        label = "Genre",
+        onValueChange = {},
+        isEnabled = false,
+    )
+    CustomTextField(
+        value = "O+", label = "Rh", onValueChange = {}, isEnabled = false
+    )
+    CustomTextField(
+        value = "213456789",
+        label = "Code used",
+        onValueChange = {},
+        isEnabled = false,
+    )
+
+    // Usamos ButtonApp aquí también
+    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button),{/*TODO*/})
+}
+
+/*
 @Composable
 fun ProfileScreenActivate() {
     // Estado del Drawer
@@ -78,3 +100,4 @@ fun ProfileScreenActivate() {
         ButtonApp("Abrir Menu", { scope.launch { drawerState.open() } })
     }
 }
+*/

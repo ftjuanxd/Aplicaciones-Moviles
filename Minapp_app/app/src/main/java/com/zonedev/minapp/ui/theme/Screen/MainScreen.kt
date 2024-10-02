@@ -20,14 +20,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.primary
 
 @Composable
-fun BackgroundApp() {
+fun MainScreen() {
     val logo = painterResource(R.drawable.logo_minapp)
     val banner = painterResource(R.drawable.arrow__2196f3)
 
-    Box(modifier = Modifier.background(primary)) {
+    Box(modifier = Modifier.background(background)) {
         Image(
             painter = banner,
             contentDescription = null,
@@ -49,13 +50,13 @@ fun BackgroundApp() {
                     .size(200.dp)
                     .padding(top = 40.dp, start = 25.dp)
             )
-            ContainerText(stringResource(R.string.app_name), stringResource(R.string.app_lema))
+            ContainerText()
         }
     }
 }
 
 @Composable
-fun ContainerText(title: String, lema: String) {
+fun ContainerText() {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

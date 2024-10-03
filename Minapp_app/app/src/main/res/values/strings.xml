@@ -24,4 +24,13 @@
     <string name="Section_Upload_Files">Upload Files</string>
     <string name="Label_Upload_Files">Evidences</string>
     <string name="Name_CheckHolder">Hold Parameters</string>
+    <string name="Name_Interfaz_Pedestrian_Access">PEDESTRIAN ACCESS</string>
+    <string name="Value_Default_Label_Camera">Scan Id</string>
+    <string name="Value_Segmented_Button">Write</string>
+    <string name="Name_Interfaz_Vehicular">VEHICULAR</string>
+    <string name="Name_Interfaz_Element">ELEMENT</string>
+    <string name="Value_Label_Element">Scan Element</string>
+    <string name="Value_Default_Label_Id">Id</string>
+    <string name="Value_Label_Vehicular">Plate</string>
+    <string name="Value_Label_Vehicular_Scan">Scan Transit License</string>
 </resources>

@@ -81,7 +81,7 @@ fun BaseScreen(
         Navbar(title, notificationIcon, logoIcon, fontSizeTitule, SizeIcon, endPadding)
         Spacer(modifier = Modifier.height(50.dp))
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -261,7 +261,7 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
 
     Row(
         modifier = Modifier
-            .border(.5.dp, color_component, RoundedCornerShape(16.dp)),
+            .border(5.dp, color_component, RoundedCornerShape(16.dp)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -278,7 +278,11 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
             modifier = Modifier
                 .weight(2f)//
         ) {
-            Text(text = "Scan Id")
+            Text(
+                text = stringResource(R.string.Value_Default_Label_Camera),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
         Button(
             onClick = { selectedButton = 1 }, // Acción de seleccionar Write
@@ -291,7 +295,10 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
             modifier = Modifier
                 .weight(2f)
         ) {
-            Text(text = "Write")
+            Text(
+                text = stringResource(R.string.Value_Segmented_Button),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold)
         }
     }
     // Aquí se muestra el contenido según el botón seleccionado
@@ -310,7 +317,7 @@ fun CheckHold() {
     // Contenedor con el Checkbox y un Text para mostrar el estado
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(end=190.dp)
+        modifier = Modifier.padding(end=220.dp)
     ) {
         Box(
             modifier = Modifier
@@ -380,7 +387,7 @@ fun FieldsThemes() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraCaptureExample() {
+fun CameraCaptureExample(vals:String = stringResource(R.string.Value_Default_Label_Camera)) {
     val context = LocalContext.current
     var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -394,12 +401,12 @@ fun CameraCaptureExample() {
     }
     // Custom TextField que muestra la imagen capturada
     CustomTextField(
-        value = "Scan Id",
+        value = vals,
         onValueChange = {},
         isEnabled = false,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .padding(bottom = 10.dp),
         label = "Upload File",
         pdHeight = 120.dp,
         onClick = {

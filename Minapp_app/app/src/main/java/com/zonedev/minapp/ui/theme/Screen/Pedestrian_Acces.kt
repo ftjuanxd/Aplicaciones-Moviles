@@ -20,79 +20,25 @@ import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.FieldsThemes
 import com.zonedev.minapp.ui.theme.Components.SegmentedButton
 import com.zonedev.minapp.ui.theme.Components.Separetor
+import com.zonedev.minapp.ui.theme.Components.Template_Scan
+import com.zonedev.minapp.ui.theme.Components.Template_Text
 
 @Composable
 fun Acces() {
     BaseScreen(
-        "PEDESTRIAN ACCESS",
+        stringResource(R.string.Name_Interfaz_Pedestrian_Access),
         R.drawable.notificacion,
         R.drawable.logo_home,
         content = {
             SegmentedButton(
                 {
-                    Components_Acces_Scan()
+                    Template_Scan()
                 },
                 {
-                    Components_Acces_Text()
+                    Template_Text()
                 }
             )
         },
         15.sp,40.dp,80.dp
     )
 }
-
-@Composable
-fun Components_Acces_Scan(){
-    //variables de los textfield
-    var destiny by remember { mutableStateOf("") }
-    var auto by remember { mutableStateOf("") }
-    var descrip by remember { mutableStateOf("") }
-
-    CameraCaptureExample()
-
-    CheckHold()
-
-    FieldsThemes()
-
-    //Button Submit
-    ButtonApp(stringResource(R.string.button_submit), { print("Hola") })
-    //Line diviser
-    Separetor()
-}
-@Composable
-fun Components_Acces_Text(){
-    //variables de los textfield
-    var Id by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-
-    CustomTextField(
-        value = Id,
-        label = "Id",
-        onValueChange = { Id = it },
-        isEnabled = true,
-        KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-        )
-    )
-    //TextField Authorization
-    CustomTextField(
-        value = name,
-        label = "Name",
-        onValueChange = { name = it },
-        isEnabled = true,
-        KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-        )
-    )
-
-    CheckHold()
-    //TextFieldS
-    FieldsThemes()
-    //Button Submit
-    ButtonApp(stringResource(R.string.button_submit), { print("Hola") })
-    //Line diviser
-    Separetor()
-}
-

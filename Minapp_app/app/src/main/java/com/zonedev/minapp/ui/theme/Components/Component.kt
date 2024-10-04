@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,14 +17,17 @@ import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,6 +70,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -75,42 +81,75 @@ import com.zonedev.minapp.ui.theme.Screen.Acces
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.LoginApp
 import com.zonedev.minapp.ui.theme.Screen.MainScreen
+import com.zonedev.minapp.ui.theme.Screen.Observations
 import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.ScreenReport
-import com.zonedev.minapp.ui.theme.Screen.Theme_Observations
+import com.zonedev.minapp.ui.theme.Screen.Observations
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
 import com.zonedev.minapp.ui.theme.text
+import java.time.format.TextStyle
 
 @Composable
 fun BaseScreen(
     title: String,
     notificationIcon: Int,
     logoIcon: Int,
-    content: @Composable () -> Unit, // Puedes cambiar el color de fondo según sea necesario
+    content: @Composable () -> Unit,
     fontSizeTitule: TextUnit,
     SizeIcon: Dp,
     endPadding: Dp
 ) {
+    var isSidebarVisible by remember { mutableStateOf(false) } // Controlar la visibilidad del sidebar
 
-    Column(
+    val navController = rememberNavController() // NavController para la navegación
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(background),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(background)
     ) {
-        Navbar(title, notificationIcon, logoIcon, fontSizeTitule, SizeIcon, endPadding)
-        Spacer(modifier = Modifier.height(50.dp))
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(background),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            content()//Aqui se muestra el contenido de cada pantalla
+            // Pasamos el evento de clic del menú desde el Navbar
+            Navbar(title, notificationIcon, logoIcon, fontSizeTitule, SizeIcon, endPadding, onMenuClick = {isSidebarVisible =!isSidebarVisible
+            })
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+              content()
+            }
         }
+
+        // Fondo semi-transparente que resalta el sidebar
+        if (isSidebarVisible) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top=56.dp)
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable { isSidebarVisible = false } // Al hacer clic en el fondo, se cierra el sidebar
+            )
+        }
+
+        // Sidebar con animación
+        SideBar(
+            isVisible = isSidebarVisible,
+
+        )
+
     }
 }
 
@@ -180,40 +219,17 @@ fun CustomTextField(
         )
     )
 }
-/**
-@Composable
-fun AppNavigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "main_screen") {
-        composable("main_screen"){
-            MainScreen(navController = navController)
-        }
-        composable("power_off") {
-            LoginApp(navController = navController)
-        }
-        composable("profile_screen") {
-            ProfileScreen()
-        }
-        composable("pedestrian_access") {
-            Acces()
-        }
-        composable("vehicular_access") {
-            Vehicular()
-        }
-        composable("element_screen") {
-            Element()
-        }
-        composable("observations_screen") {
-            Theme_Observations()
-        }
-        composable("reports") {
-            ScreenReport()
-        }
-    }
-}
-*/
 
 @Composable
-fun Navbar(Titule:String, @DrawableRes Activenotificacion: Int, @DrawableRes home_power: Int, fontSizeTitule: TextUnit, SizeIcon: Dp, endPadding: Dp) {
+fun Navbar(
+    Titule: String,
+    @DrawableRes Activenotificacion: Int,
+    @DrawableRes home_power: Int,
+    fontSizeTitule: TextUnit,
+    SizeIcon: Dp,
+    endPadding: Dp,
+    onMenuClick: () -> Unit, // Agregar una función para manejar el clic en el ícono de menú
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,25 +242,26 @@ fun Navbar(Titule:String, @DrawableRes Activenotificacion: Int, @DrawableRes hom
             painter = painterResource(id = R.drawable.logo_menu_burger),
             contentDescription = Titule,
             tint = colorResource(R.color.background),
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier
+                .size(30.dp)
+                .clickable{onMenuClick()}
         )
         Text(
             text = Titule,
             color = Color.White,
             fontSize = fontSizeTitule,
             fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(end = endPadding, top = 5.dp)//menu end=180.dp
+            modifier = Modifier.padding(end = endPadding, top = 5.dp)
         )
-        Row{
+        Row {
             Icon(
                 painter = painterResource(id = Activenotificacion),
                 contentDescription = stringResource(R.string.Descripcion_Navbar_Icon_Notificacion),
                 tint = colorResource(R.color.background),
                 modifier = Modifier.size(SizeIcon)
             )
-            //Spacer(modifier = Modifier.width(16.dp))
             Icon(
-                painter = painterResource(id =home_power),
+                painter = painterResource(id = home_power),
                 contentDescription = stringResource(R.string.Descripcion_Navbar_Icon_Power),
                 modifier = Modifier.size(SizeIcon),
                 tint = colorResource(R.color.background)
@@ -253,70 +270,7 @@ fun Navbar(Titule:String, @DrawableRes Activenotificacion: Int, @DrawableRes hom
     }
 }
 
-/**
-@Composable
-fun SideBarWithShadow(navController: NavHostController) {
-    Box(
-        modifier = Modifier
-            .width(80.dp) // Ajusta el ancho del sidebar aquí
-            .fillMaxHeight() // Ocupa toda la altura de la pantalla
-            .shadow(elevation = 8.dp)
-            .background(primary)
-            .padding(16.dp) // Espaciado interno del sidebar
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween, // Distribuye los íconos de forma equitativa
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxHeight() // Asegura que la columna ocupe toda la altura disponible
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.logo_observations),
-                contentDescription = "Observations",
-                tint = colorResource(R.color.background),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { navController.navigate("observations_screen") }
-            )
-            Spacer(modifier = Modifier.height(24.dp)) // Ajusta la distancia entre los íconos
-            Icon(
-                painter = painterResource(id = R.drawable.logo_vehicular),
-                contentDescription = "Vehicular Access",
-                tint = colorResource(R.color.background),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { navController.navigate("vehicular_access") }
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.logo_personal),
-                contentDescription = "Personal",
-                tint = colorResource(R.color.background),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { navController.navigate("pedestrian_access") }
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.logo_elements),
-                contentDescription = "Elements",
-                tint = colorResource(R.color.background),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { navController.navigate("element_screen") }
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.logo_report),
-                contentDescription = "Reportes",
-                tint = colorResource(R.color.background),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { navController.navigate("reports") }
-            )
-        }
-    }
-}
-**/
+
 @Composable
 fun ButtonApp(
     text: String,
@@ -554,7 +508,7 @@ fun DropdownMenu() {
             modifier = Modifier
                 .wrapContentWidth()
                 .align(alignment = Alignment.Center)
-                .padding(end= 16.dp, start = 16.dp),
+                .padding(end = 16.dp, start = 16.dp),
         ) {
             Text(text = selectedOption, color = background)
             Icon(
@@ -567,7 +521,9 @@ fun DropdownMenu() {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(). padding(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
@@ -692,5 +648,72 @@ fun PaginationScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+    }
+}
+
+@Composable
+fun SideBar(isVisible: Boolean) {
+    val offsetX by animateDpAsState(
+        targetValue = if (isVisible) 0.dp else (-178).dp, // Mostrar/ocultar sidebar
+        animationSpec = tween(durationMillis = 300) // Animación suave
+    )
+
+    Box(
+        modifier = Modifier
+            .offset(x = offsetX)
+            .fillMaxHeight()
+            .width(200.dp)
+            .padding(top=56.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .background(primary)
+                .padding(top = 5.dp, start = 6.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Aquí van los íconos de tu sidebar
+            Icon(
+                painter = painterResource(R.drawable.logo_observations),
+                contentDescription = null,
+                tint = background,
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                painter = painterResource(R.drawable.logo_vehicular),
+                contentDescription = null,
+                tint = background,
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                painter = painterResource(R.drawable.logo_personal),
+                contentDescription = null,
+                tint = background,
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                painter = painterResource(R.drawable.logo_elements),
+                contentDescription = null,
+                tint = background,
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                painter = painterResource(R.drawable.logo_report),
+                contentDescription = null,
+                tint = background,
+                modifier = Modifier
+                    .size(50.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+        }
     }
 }

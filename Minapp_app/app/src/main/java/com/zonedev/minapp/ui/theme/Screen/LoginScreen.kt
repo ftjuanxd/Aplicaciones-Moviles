@@ -2,6 +2,7 @@ package com.zonedev.minapp.ui.theme.Screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.R
@@ -41,7 +44,7 @@ import com.zonedev.minapp.ui.theme.primary
 
 // Login Screen
 @Composable
-fun LoginApp() {
+fun LoginApp(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +54,7 @@ fun LoginApp() {
     ) {
         BlobUi()
         Spacer(modifier = Modifier.height((-20).dp)) // Reduce la altura entre componentes
-        CustomLoginScreen()
+        CustomLoginScreen(navController)
     }
 }
 
@@ -79,9 +82,10 @@ fun BlobUi() {
 }
 
 @Composable
-fun CustomLoginScreen() {
+fun CustomLoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    // Se crea el NavController para manejar la navegación
 
     Column(
         modifier = Modifier
@@ -117,6 +121,7 @@ fun CustomLoginScreen() {
         )
 
         // Usamos ButtonApp en lugar de Button
-        ButtonApp(stringResource(R.string.name_button_login),{/*TODO*/})
+        ButtonApp(stringResource(R.string.name_button_login),{navController.navigate("profile_screen")},)
+        // Llamada al NavHost que maneja la navegación entre pantallas
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.MinappTheme
 import com.zonedev.minapp.ui.theme.Screen.Acces
@@ -33,6 +34,7 @@ import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.LoginApp
 import com.zonedev.minapp.ui.theme.Screen.MainScreen
 import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
+import com.zonedev.minapp.ui.theme.Screen.ScreenReport
 import com.zonedev.minapp.ui.theme.Screen.Theme_Observations
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
@@ -47,7 +49,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MinappTheme {
-                Vehicular()
+                //val navController = rememberNavController()
+                //AppNavigation(navController = navController)
+                ScreenReport()
             }
         }
     }

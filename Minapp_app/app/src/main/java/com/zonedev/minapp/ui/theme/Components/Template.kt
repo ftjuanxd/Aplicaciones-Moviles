@@ -16,14 +16,14 @@ fun Template_Scan(IsScreenElement: Boolean=false,vals:String = stringResource(R.
 
     if (IsScreenElement){
         //Camara de elementos
-        CameraCaptureExample(vals)
+        CameraCapture(vals)
         //Camara de Identificacion
-        CameraCaptureExample()
+        CameraCapture()
         //Componentes
         Components_Template()
     }else{
         //Camara de Elementos
-        CameraCaptureExample(vals)
+        CameraCapture(vals)
         //Componentes
         Components_Template()
     }
@@ -36,7 +36,7 @@ fun Template_Text(IsScreenElement: Boolean=false,Label_Id:String= stringResource
     var name by remember { mutableStateOf("") }
 
     if (IsScreenElement){
-        CameraCaptureExample(stringResource(R.string.Value_Label_Element))
+        CameraCapture(stringResource(R.string.Value_Label_Element))
     }
     CustomTextField(
         value = Id,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,18 +22,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -42,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -51,15 +60,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.Screen.Acces
+import com.zonedev.minapp.ui.theme.Screen.Element
+import com.zonedev.minapp.ui.theme.Screen.LoginApp
+import com.zonedev.minapp.ui.theme.Screen.MainScreen
+import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
+import com.zonedev.minapp.ui.theme.Screen.ScreenReport
+import com.zonedev.minapp.ui.theme.Screen.Theme_Observations
+import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
-
+import com.zonedev.minapp.ui.theme.text
 
 @Composable
 fun BaseScreen(
@@ -71,6 +94,7 @@ fun BaseScreen(
     SizeIcon: Dp,
     endPadding: Dp
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -156,7 +180,37 @@ fun CustomTextField(
         )
     )
 }
-
+/**
+@Composable
+fun AppNavigation(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = "main_screen") {
+        composable("main_screen"){
+            MainScreen(navController = navController)
+        }
+        composable("power_off") {
+            LoginApp(navController = navController)
+        }
+        composable("profile_screen") {
+            ProfileScreen()
+        }
+        composable("pedestrian_access") {
+            Acces()
+        }
+        composable("vehicular_access") {
+            Vehicular()
+        }
+        composable("element_screen") {
+            Element()
+        }
+        composable("observations_screen") {
+            Theme_Observations()
+        }
+        composable("reports") {
+            ScreenReport()
+        }
+    }
+}
+*/
 
 @Composable
 fun Navbar(Titule:String, @DrawableRes Activenotificacion: Int, @DrawableRes home_power: Int, fontSizeTitule: TextUnit, SizeIcon: Dp, endPadding: Dp) {
@@ -199,6 +253,70 @@ fun Navbar(Titule:String, @DrawableRes Activenotificacion: Int, @DrawableRes hom
     }
 }
 
+/**
+@Composable
+fun SideBarWithShadow(navController: NavHostController) {
+    Box(
+        modifier = Modifier
+            .width(80.dp) // Ajusta el ancho del sidebar aquí
+            .fillMaxHeight() // Ocupa toda la altura de la pantalla
+            .shadow(elevation = 8.dp)
+            .background(primary)
+            .padding(16.dp) // Espaciado interno del sidebar
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween, // Distribuye los íconos de forma equitativa
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxHeight() // Asegura que la columna ocupe toda la altura disponible
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.logo_observations),
+                contentDescription = "Observations",
+                tint = colorResource(R.color.background),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { navController.navigate("observations_screen") }
+            )
+            Spacer(modifier = Modifier.height(24.dp)) // Ajusta la distancia entre los íconos
+            Icon(
+                painter = painterResource(id = R.drawable.logo_vehicular),
+                contentDescription = "Vehicular Access",
+                tint = colorResource(R.color.background),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { navController.navigate("vehicular_access") }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.logo_personal),
+                contentDescription = "Personal",
+                tint = colorResource(R.color.background),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { navController.navigate("pedestrian_access") }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.logo_elements),
+                contentDescription = "Elements",
+                tint = colorResource(R.color.background),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { navController.navigate("element_screen") }
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.logo_report),
+                contentDescription = "Reportes",
+                tint = colorResource(R.color.background),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { navController.navigate("reports") }
+            )
+        }
+    }
+}
+**/
 @Composable
 fun ButtonApp(
     text: String,
@@ -387,7 +505,7 @@ fun FieldsThemes() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraCaptureExample(vals:String = stringResource(R.string.Value_Default_Label_Camera)) {
+fun CameraCapture(vals:String = stringResource(R.string.Value_Default_Label_Camera)) {
     val context = LocalContext.current
     var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -415,4 +533,164 @@ fun CameraCaptureExample(vals:String = stringResource(R.string.Value_Default_Lab
         },
         bitmap = capturedBitmap // Pasar la imagen capturada al TextField
     )
+}
+
+//Screen Report
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Pedestrian Access") }
+    val options = listOf("Pedestrian Access", "Vehicular", "Element", "Observations")
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Button(
+            onClick = { expanded = true },
+            colors = ButtonDefaults.buttonColors(containerColor = primary),
+            modifier = Modifier
+                .wrapContentWidth()
+                .align(alignment = Alignment.Center)
+                .padding(end= 16.dp, start = 16.dp),
+        ) {
+            Text(text = selectedOption, color = background)
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "Dropdown",
+                tint = background
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(). padding(12.dp)
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(text = option) },
+                    onClick = {
+                        selectedOption = option
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+    Separetor()
+    Spacer(modifier = Modifier.height(20.dp))
+
+    // Mostrar contenido dependiendo de la opción seleccionada
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        when (selectedOption) {
+                "Pedestrian Access" -> PaginationScreen()
+                "Vehicular" -> PaginationScreen()
+                "Element" -> PaginationScreen()
+                "Observations" -> PaginationScreen()
+                else -> "Please select an option"
+            }
+    }
+}
+
+@Composable
+fun Pagination(
+    totalPages: Int,
+    currentPage: Int,
+    onPageChanged: (Int) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, primary)
+            .background(primary)
+    ) {
+        // Botón de "Previous"
+        TextButton(
+            onClick = {
+                if (currentPage > 1) {
+                    onPageChanged(currentPage - 1)
+                }
+            },
+            enabled = currentPage > 1
+        ) {
+            Text("Previous", color = if (currentPage > 1)  background else color_component)
+        }
+
+        //Spacer(modifier = Modifier.width(8.dp))
+
+        // Números de páginas
+        for (page in 1..totalPages) {
+            TextButton(
+                onClick = {
+                    onPageChanged(page)
+                }
+            ) {
+                Text(
+                    text = page.toString(),
+                    color = if (page == currentPage) color_component else background
+                )
+            }
+        }
+
+        //Spacer(modifier = Modifier.width(8.dp))
+
+        // Botón de "Next"
+        TextButton(
+            onClick = {
+                if (currentPage < totalPages) {
+                    onPageChanged(currentPage + 1)
+                }
+            },
+            enabled = currentPage < totalPages
+        ) {
+            Text("Next", color = if (currentPage < totalPages) background else color_component)
+        }
+    }
+}
+
+@Composable
+fun ContentForPage(items: List<String>, itemsPerPage: Int, currentPage: Int) {
+    val startIndex = (currentPage - 1) * itemsPerPage
+    val endIndex = minOf(startIndex + itemsPerPage, items.size)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, color_component, shape = RoundedCornerShape(2.dp))
+    ) {
+        for (index in startIndex until endIndex) {
+            Text(text = items[index], modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+@Composable
+fun PaginationScreen() {
+    var currentPage by remember { mutableStateOf(1) }
+    val itemsPerPage = 5 // Número de elementos por página
+    val items = List(20) { "Item #${it + 1}" } // Lista de ejemplo con 20 elementos
+    val totalPages = (items.size + itemsPerPage - 1) / itemsPerPage // Calcular número de páginas
+
+    Column {
+
+        // Componente de paginación
+        Pagination(
+            totalPages = totalPages,
+            currentPage = currentPage,
+            onPageChanged = { newPage ->
+                currentPage = newPage
+            }
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        // Mostrar contenido según la página actual
+        ContentForPage(items = items, itemsPerPage = itemsPerPage, currentPage = currentPage)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+    }
 }

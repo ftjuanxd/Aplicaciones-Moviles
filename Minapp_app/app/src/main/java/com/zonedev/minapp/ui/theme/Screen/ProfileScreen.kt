@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
@@ -27,6 +28,7 @@ import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.background
 import kotlinx.coroutines.launch
 
+@Preview
 @Composable
 fun ProfileScreen() {
     BaseScreen(stringResource(R.string.Descripcion_Navbar_Icon_Profile_Screen),R.drawable.notificacion,R.drawable.power_off,
@@ -83,21 +85,3 @@ fun Components_Profile_Screen(){
     // Usamos ButtonApp aquí también
     ButtonApp(text = stringResource(R.string.Text_profileScreen_Button),{/*TODO*/})
 }
-
-/*
-@Composable
-fun ProfileScreenActivate() {
-    // Estado del Drawer
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerContent = { /* Contenido del Drawer */ }
-    ) {
-        ProfileScreen() // Contenido de la pantalla de perfil
-        // Ejemplo de cómo abrir el Drawer
-        ButtonApp("Abrir Menu", { scope.launch { drawerState.open() } })
-    }
-}
-*/

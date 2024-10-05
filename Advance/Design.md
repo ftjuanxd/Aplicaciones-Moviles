@@ -7,7 +7,7 @@ Los mockups fueron realizados primeramente en Canva y seguido el prototipo en Ma
 
 Depende el del rango de la persona dentro del trabajo lo que se le mostraria seria distinto si es un guarda de seguridad este tendra acceso a los registros, en caso de ser un supervisor o la central estos tendran acceso a los reportes.
 Tras el Login encontraras la siguiente Imagen:
-=======
+
 Tras el Login se encontrara con la siguiente Imagen:
 
 
@@ -33,6 +33,10 @@ Tras el Login se encontrara con la siguiente Imagen:
   ![Search_Places](../Img/Search_Place.png)
   ###   - Search Employee
   ![Search_Employee](../Img/Search_employee.png)
+
+
+## Alcance Parcial
+En pro de una entrega funcional para este proyecto solo se trabajara la seccion del Guarda de Seguridad siendo que en futuro se agregaran mas funciones como el chat empresarial y las UI de Administrador
 
 ## Recursos:
 

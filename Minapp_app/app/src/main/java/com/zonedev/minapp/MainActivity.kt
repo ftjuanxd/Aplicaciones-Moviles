@@ -31,14 +31,14 @@ import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.MinappTheme
-import com.zonedev.minapp.ui.theme.Screen.Acces
+import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.Components_Profile_Screen
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.LoginApp
 import com.zonedev.minapp.ui.theme.Screen.MainScreen
-import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.ScreenReport
 import com.zonedev.minapp.ui.theme.Screen.Observations
+import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.bodyFontFamily
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MinappTheme {
-               ProfileScreen()
+                BaseScreen()
             }
         }
     }

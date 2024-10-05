@@ -31,8 +31,7 @@ import kotlinx.coroutines.launch
 @Preview
 @Composable
 fun ProfileScreen() {
-    BaseScreen(stringResource(R.string.Descripcion_Navbar_Icon_Profile_Screen),R.drawable.notificacion,R.drawable.power_off,
-        {Components_Profile_Screen()},20.sp,40.dp,180.dp)
+    Components_Profile_Screen()
 }
 
 @Composable

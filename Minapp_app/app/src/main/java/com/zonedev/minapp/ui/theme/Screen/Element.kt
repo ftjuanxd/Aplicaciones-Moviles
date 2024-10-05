@@ -12,20 +12,12 @@ import com.zonedev.minapp.ui.theme.Components.Template_Text
 
 @Composable
 fun Element() {
-    BaseScreen(
-        stringResource(R.string.Name_Interfaz_Element),
-        R.drawable.notificacion,
-        R.drawable.logo_home,
-        content = {
-            SegmentedButton(
-                {
-                    Template_Scan(true, stringResource(R.string.Value_Label_Element))
-                },
-                {
-                    Template_Text(true)
-                }
-            )
+    SegmentedButton(
+        {
+            Template_Scan(true, stringResource(R.string.Value_Label_Element))
         },
-        25.sp,40.dp,130.dp
+        {
+            Template_Text(true)
+        }
     )
 }

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -77,7 +78,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.R
-import com.zonedev.minapp.ui.theme.Screen.Acces
+import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.LoginApp
 import com.zonedev.minapp.ui.theme.Screen.MainScreen
@@ -85,6 +86,7 @@ import com.zonedev.minapp.ui.theme.Screen.Observations
 import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.ScreenReport
 import com.zonedev.minapp.ui.theme.Screen.Observations
+import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
@@ -93,18 +95,61 @@ import com.zonedev.minapp.ui.theme.text
 import java.time.format.TextStyle
 
 @Composable
-fun BaseScreen(
-    title: String,
-    notificationIcon: Int,
-    logoIcon: Int,
-    content: @Composable () -> Unit,
-    fontSizeTitule: TextUnit,
-    SizeIcon: Dp,
-    endPadding: Dp
-) {
+fun BaseScreen(opc : String = "home") {
+    var opcClic by remember { mutableStateOf(opc) }
     var isSidebarVisible by remember { mutableStateOf(false) } // Controlar la visibilidad del sidebar
 
-    val navController = rememberNavController() // NavController para la navegación
+    // Variables dinámicas para el contenido del Navbar - default de profile Screen
+    var title by remember { mutableStateOf(R.string.Descripcion_Navbar_Icon_Profile_Screen)}
+    var notificationIcon by remember { mutableStateOf(R.drawable.notificacion) }
+    var logoIcon by remember { mutableStateOf(R.drawable.power_off) }
+    var fontSizeTitule by remember { mutableStateOf(20.sp) }
+    var SizeIcon by remember { mutableStateOf(40.dp) }
+    var endPadding by remember { mutableStateOf(180.dp) }
+
+    // Actualizamos los valores de Navbar según la opción seleccionada
+    when (opcClic) {
+        "obs" -> {
+            title = R.string.Name_Interfaz_Observations
+            notificationIcon = R.drawable.notificacion
+            logoIcon = R.drawable.logo_home
+            fontSizeTitule = 20.sp
+            SizeIcon = 40.dp
+            endPadding = 100.dp
+        }
+        "veh" -> {
+            title = R.string.Name_Interfaz_Vehicular
+            notificationIcon = R.drawable.notificacion
+            logoIcon =  R.drawable.logo_home
+            fontSizeTitule = 25.sp
+            SizeIcon = 40.dp
+            endPadding = 130.dp
+        }
+        "per" -> {
+            title = R.string.Name_Interfaz_Pedestrian_Access
+            notificationIcon = R.drawable.notificacion
+            logoIcon =  R.drawable.logo_home
+            fontSizeTitule = 15.sp
+            SizeIcon = 40.dp
+            endPadding = 80.dp
+        }
+        "ele" -> {
+            title = R.string.Name_Interfaz_Element
+            notificationIcon = R.drawable.notificacion
+            logoIcon =  R.drawable.logo_home
+            fontSizeTitule = 25.sp
+            SizeIcon = 40.dp
+            endPadding = 130.dp
+        }
+        "rep" -> {
+            title = R.string.Name_Interfaz_Element
+            notificationIcon = R.drawable.notificacion
+            logoIcon =  R.drawable.logo_home
+            fontSizeTitule = 20.sp
+            SizeIcon = 40.dp
+            endPadding = 200.dp
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -118,9 +163,20 @@ fun BaseScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             // Pasamos el evento de clic del menú desde el Navbar
-            Navbar(title, notificationIcon, logoIcon, fontSizeTitule, SizeIcon, endPadding, onMenuClick = {isSidebarVisible =!isSidebarVisible
-            })
+            Navbar(
+                Titule = title,
+                Activenotificacion = notificationIcon,
+                home_power = logoIcon,
+                fontSizeTitule = fontSizeTitule,
+                SizeIcon = SizeIcon,
+                endPadding = endPadding,
+                onMenuClick = { isSidebarVisible = !isSidebarVisible }, // Alternar visibilidad del sidebar
+                onItemClick = { clickedOption ->
+                    opcClic = clickedOption // Actualizar la opción clickeada
+                }
+            )
 
             Spacer(modifier = Modifier.height(50.dp))
 
@@ -129,7 +185,15 @@ fun BaseScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-              content()
+                // Navegar según la opción clickeada
+                when (opcClic) {
+                    "home" -> ProfileScreen()
+                    "obs" -> Observations()
+                    "veh" -> Vehicular()
+                    "per" -> Personal()
+                    "ele" -> Element()
+                    "rep" -> ScreenReport()
+                }
             }
         }
 
@@ -138,20 +202,25 @@ fun BaseScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top=56.dp)
+                    .padding(top = 56.dp)
                     .background(Color.Black.copy(alpha = 0.5f))
                     .clickable { isSidebarVisible = false } // Al hacer clic en el fondo, se cierra el sidebar
             )
         }
 
         // Sidebar con animación
-        SideBar(
-            isVisible = isSidebarVisible,
-
-        )
-
+        if (isSidebarVisible) {
+            SideBar(
+                isVisible = isSidebarVisible,
+                onItemClick = { clickedOption ->
+                    opcClic = clickedOption
+                    isSidebarVisible = false // Oculta el sidebar después de hacer clic
+                }
+            )
+        }
     }
 }
+
 
 @Composable
 fun Separetor() {
@@ -222,13 +291,14 @@ fun CustomTextField(
 
 @Composable
 fun Navbar(
-    Titule: String,
+    @StringRes Titule: Int,
     @DrawableRes Activenotificacion: Int,
     @DrawableRes home_power: Int,
     fontSizeTitule: TextUnit,
     SizeIcon: Dp,
     endPadding: Dp,
-    onMenuClick: () -> Unit, // Agregar una función para manejar el clic en el ícono de menú
+    onMenuClick: () -> Unit, // Para manejar el clic en el menú
+    onItemClick: (String) -> Unit // Manejar los clics de los ítems
 ) {
     Row(
         modifier = Modifier
@@ -240,15 +310,15 @@ fun Navbar(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.logo_menu_burger),
-            contentDescription = Titule,
+            contentDescription = stringResource(id = Titule),
             tint = colorResource(R.color.background),
             modifier = Modifier
                 .size(30.dp)
-                .clickable{onMenuClick()}
+                .clickable { onMenuClick() } // Abre/cierra el sidebar
         )
         Text(
-            text = Titule,
-            color = Color.White,
+            text = stringResource(id=Titule),
+            color = background,
             fontSize = fontSizeTitule,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.padding(end = endPadding, top = 5.dp)
@@ -258,18 +328,29 @@ fun Navbar(
                 painter = painterResource(id = Activenotificacion),
                 contentDescription = stringResource(R.string.Descripcion_Navbar_Icon_Notificacion),
                 tint = colorResource(R.color.background),
-                modifier = Modifier.size(SizeIcon)
+                modifier = Modifier
+                    .size(SizeIcon)
+                    .clickable {
+                        onItemClick("chat") // Notificación
+                    }
             )
             Icon(
                 painter = painterResource(id = home_power),
                 contentDescription = stringResource(R.string.Descripcion_Navbar_Icon_Power),
-                modifier = Modifier.size(SizeIcon),
+                modifier = Modifier
+                    .size(SizeIcon)
+                    .clickable {
+                        if (home_power == R.drawable.power_off) {
+                            onItemClick("power_off") // Apagar o salir
+                        } else {
+                            onItemClick("home") // Ir al inicio
+                        }
+                    },
                 tint = colorResource(R.color.background)
             )
         }
     }
 }
-
 
 @Composable
 fun ButtonApp(
@@ -652,7 +733,10 @@ fun PaginationScreen() {
 }
 
 @Composable
-fun SideBar(isVisible: Boolean) {
+fun SideBar(
+    isVisible: Boolean,
+    onItemClick: (String) -> Unit // Manejar los clics
+) {
     val offsetX by animateDpAsState(
         targetValue = if (isVisible) 0.dp else (-178).dp, // Mostrar/ocultar sidebar
         animationSpec = tween(durationMillis = 300) // Animación suave
@@ -663,7 +747,7 @@ fun SideBar(isVisible: Boolean) {
             .offset(x = offsetX)
             .fillMaxHeight()
             .width(200.dp)
-            .padding(top=56.dp)
+            .padding(top = 56.dp)
     ) {
         Column(
             modifier = Modifier
@@ -673,13 +757,15 @@ fun SideBar(isVisible: Boolean) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Aquí van los íconos de tu sidebar
             Icon(
                 painter = painterResource(R.drawable.logo_observations),
                 contentDescription = null,
                 tint = background,
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onItemClick("obs") // Clic en "Observations"
+                    }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Icon(
@@ -688,6 +774,9 @@ fun SideBar(isVisible: Boolean) {
                 tint = background,
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onItemClick("veh") // Clic en "Vehicular"
+                    }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Icon(
@@ -696,6 +785,9 @@ fun SideBar(isVisible: Boolean) {
                 tint = background,
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onItemClick("per") // Clic en "Personal"
+                    }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Icon(
@@ -704,6 +796,9 @@ fun SideBar(isVisible: Boolean) {
                 tint = background,
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onItemClick("ele") // Clic en "Elementos"
+                    }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Icon(
@@ -712,6 +807,9 @@ fun SideBar(isVisible: Boolean) {
                 tint = background,
                 modifier = Modifier
                     .size(50.dp)
+                    .clickable {
+                        onItemClick("rep") // Clic en "Report"
+                    }
             )
             Spacer(modifier = Modifier.height(10.dp))
         }

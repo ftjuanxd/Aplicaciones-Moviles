@@ -20,8 +20,7 @@ import com.zonedev.minapp.ui.theme.Components.UploadFileScreen
 
 @Composable
 fun Observations(){
-    BaseScreen(stringResource(R.string.Name_Interfaz_Observations),R.drawable.notificacion,R.drawable.logo_home,
-        { Components_Observations() },20.sp,40.dp,100.dp)
+    Components_Observations()
 }
 @Composable
 fun Components_Observations(){

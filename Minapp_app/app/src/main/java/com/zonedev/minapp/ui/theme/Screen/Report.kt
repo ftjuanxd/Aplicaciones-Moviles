@@ -10,5 +10,5 @@ import com.zonedev.minapp.ui.theme.Components.Separetor
 
 @Composable
 fun ScreenReport(){
-    BaseScreen("REPORT", R.drawable.notificacion,R.drawable.logo_home, {DropdownMenu()},20.sp,40.dp,200.dp)
+    DropdownMenu()
 }

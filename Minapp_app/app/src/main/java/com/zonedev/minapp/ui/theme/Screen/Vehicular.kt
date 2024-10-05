@@ -12,20 +12,21 @@ import com.zonedev.minapp.ui.theme.Components.Template_Text
 
 @Composable
 fun Vehicular() {
-    BaseScreen(
-        stringResource(R.string.Name_Interfaz_Vehicular),
-        R.drawable.notificacion,
-        R.drawable.logo_home,
-        content = {
-            SegmentedButton(
-                {
-                    Template_Scan(vals = stringResource(R.string.Value_Label_Vehicular_Scan))
-                },
-                {
-                    Template_Text(Label_Id = stringResource(R.string.Value_Label_Vehicular))
-                }
-            )
+    SegmentedButton(
+        {
+            Template_Scan(vals = stringResource(R.string.Value_Label_Vehicular_Scan))
         },
-        25.sp,40.dp,130.dp
+        {
+            Template_Text(Label_Id = stringResource(R.string.Value_Label_Vehicular))
+        }
     )
 }
+/***
+ *  BaseScreen(
+ *         stringResource(R.string.Name_Interfaz_Vehicular),
+ *         R.drawable.notificacion,
+ *         R.drawable.logo_home,
+ *         content = {}
+ *         ,
+ *         25.sp,40.dp,130.dp
+ */

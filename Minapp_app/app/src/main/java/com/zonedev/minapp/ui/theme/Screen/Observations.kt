@@ -19,9 +19,8 @@ import com.zonedev.minapp.ui.theme.Components.Separetor
 import com.zonedev.minapp.ui.theme.Components.UploadFileScreen
 
 @Composable
-fun Theme_Observations(){
-    BaseScreen(stringResource(R.string.Name_Interfaz_Observations),R.drawable.notificacion,R.drawable.logo_home,
-        { Components_Observations() },20.sp,40.dp,100.dp)
+fun Observations(){
+    Components_Observations()
 }
 @Composable
 fun Components_Observations(){

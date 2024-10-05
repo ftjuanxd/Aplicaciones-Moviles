@@ -11,21 +11,13 @@ import com.zonedev.minapp.ui.theme.Components.Template_Scan
 import com.zonedev.minapp.ui.theme.Components.Template_Text
 
 @Composable
-fun Acces() {
-    BaseScreen(
-        stringResource(R.string.Name_Interfaz_Pedestrian_Access),
-        R.drawable.notificacion,
-        R.drawable.logo_home,
-        content = {
-            SegmentedButton(
-                {
-                    Template_Scan()
-                },
-                {
-                    Template_Text()
-                }
-            )
+fun Personal() {
+    SegmentedButton(
+        {
+            Template_Scan()
         },
-        15.sp,40.dp,80.dp
+        {
+            Template_Text()
+        }
     )
 }

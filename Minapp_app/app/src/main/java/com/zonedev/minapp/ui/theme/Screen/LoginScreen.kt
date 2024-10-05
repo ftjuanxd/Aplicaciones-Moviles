@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.R
@@ -121,7 +120,7 @@ fun CustomLoginScreen(navController: NavController) {
         )
 
         // Usamos ButtonApp en lugar de Button
-        ButtonApp(stringResource(R.string.name_button_login),{navController.navigate("profile_screen")},)
+        ButtonApp(stringResource(R.string.name_button_login),{navController.navigate("profile")})
         // Llamada al NavHost que maneja la navegación entre pantallas
     }
 }

@@ -21,8 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.primary
@@ -35,10 +33,7 @@ fun MainScreen(navController: NavController) {
 
     Box(modifier = Modifier
         .background(background)
-        .clickable {
-            // Navegación a la siguiente pantalla (puedes cambiar la ruta "next_screen" por la que necesites)
-            navController.navigate("next_screen")
-        }
+        .clickable{navController.navigate("login") }
     ) {
         Image(
             painter = banner,

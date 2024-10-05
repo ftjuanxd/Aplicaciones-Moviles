@@ -34,6 +34,10 @@ Tras el Login se encontrara con la siguiente Imagen:
   ###   - Search Employee
   ![Search_Employee](../Img/Search_employee.png)
 
+
+## Alcance Parcial
+En pro de una entrega funcional para este proyecto solo se trabajara la seccion del Guarda de Seguridad siendo que en futuro se agregaran mas funciones como el chat empresarial y las UI de Administrador
+
 ## Recursos:
 
 [Design_Canvas](https://www.canva.com/design/DAGDz1qTpTM/9IeqHv_WUc76YYqTC1fo3A/view?mode=prototype)

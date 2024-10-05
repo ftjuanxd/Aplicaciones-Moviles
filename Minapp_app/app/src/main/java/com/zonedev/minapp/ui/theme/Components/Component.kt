@@ -95,7 +95,7 @@ import com.zonedev.minapp.ui.theme.text
 import java.time.format.TextStyle
 
 @Composable
-fun BaseScreen(opc : String = "home") {
+fun BaseScreen(opc : String = "home",navController: NavController) {
     var opcClic by remember { mutableStateOf(opc) }
     var isSidebarVisible by remember { mutableStateOf(false) } // Controlar la visibilidad del sidebar
 
@@ -142,12 +142,20 @@ fun BaseScreen(opc : String = "home") {
             endPadding = 130.dp
         }
         "rep" -> {
-            title = R.string.Name_Interfaz_Element
+            title = R.string.Name_Interfaz_Report
             notificationIcon = R.drawable.notificacion
             logoIcon =  R.drawable.logo_home
             fontSizeTitule = 20.sp
             SizeIcon = 40.dp
             endPadding = 200.dp
+        }
+        "home" -> {
+            title = R.string.Descripcion_Navbar_Icon_Profile_Screen
+            notificationIcon = R.drawable.notificacion
+            logoIcon =  R.drawable.power_off
+            fontSizeTitule = 20.sp
+            SizeIcon = 40.dp
+            endPadding = 180.dp
         }
     }
 
@@ -175,7 +183,8 @@ fun BaseScreen(opc : String = "home") {
                 onMenuClick = { isSidebarVisible = !isSidebarVisible }, // Alternar visibilidad del sidebar
                 onItemClick = { clickedOption ->
                     opcClic = clickedOption // Actualizar la opción clickeada
-                }
+                },
+                navController
             )
 
             Spacer(modifier = Modifier.height(50.dp))
@@ -298,7 +307,8 @@ fun Navbar(
     SizeIcon: Dp,
     endPadding: Dp,
     onMenuClick: () -> Unit, // Para manejar el clic en el menú
-    onItemClick: (String) -> Unit // Manejar los clics de los ítems
+    onItemClick: (String) -> Unit, // Manejar los clics de los ítems
+    navController: NavController
 ) {
     Row(
         modifier = Modifier
@@ -341,7 +351,7 @@ fun Navbar(
                     .size(SizeIcon)
                     .clickable {
                         if (home_power == R.drawable.power_off) {
-                            onItemClick("power_off") // Apagar o salir
+                          navController.navigate("login")
                         } else {
                             onItemClick("home") // Ir al inicio
                         }

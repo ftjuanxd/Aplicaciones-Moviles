@@ -20,19 +20,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.primary
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
 
     val logo = painterResource(R.drawable.logo_minapp)
     val banner = painterResource(R.drawable.arrow__2196f3)
 
     Box(modifier = Modifier
         .background(background)
-        .clickable{}
+        .clickable{navController.navigate("login") }
     ) {
         Image(
             painter = banner,

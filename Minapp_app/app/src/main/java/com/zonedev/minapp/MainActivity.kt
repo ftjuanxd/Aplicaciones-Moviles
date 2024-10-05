@@ -27,6 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
@@ -52,7 +54,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MinappTheme {
-                BaseScreen()
+                val navController = rememberNavController()
+
+                NavHost(navController, startDestination = "main") {
+                    composable("main") { MainScreen(navController) }
+                    composable("login") { LoginApp(navController) }
+                    composable("profile") { BaseScreen("home",navController) }
+                }
             }
         }
     }

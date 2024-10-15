@@ -30,45 +30,69 @@ fun Template_Scan(IsScreenElement: Boolean=false,vals:String = stringResource(R.
 }
 
 @Composable
-fun Template_Text(IsScreenElement: Boolean=false,Label_Id:String= stringResource(R.string.Value_Default_Label_Id)){
-    //variables de los textfield
+fun Template_Text(IsScreenElement: Boolean = false, Label_Id: String = stringResource(R.string.Value_Default_Label_Id)) {
+    // Variables de los textfields
     var Id by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
 
-    if (IsScreenElement){
+    // Controla si se muestra el modal
+    var showModal by remember { mutableStateOf(false) }
+
+    if (IsScreenElement) {
         CameraCapture(stringResource(R.string.Value_Label_Element))
     }
+
     CustomTextField(
         value = Id,
         label = Label_Id,
         onValueChange = { Id = it },
         isEnabled = true,
-        KeyboardOptions.Default.copy(
+        keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
         )
     )
-    //TextField Authorization
+
+    // TextField Authorization
     CustomTextField(
         value = name,
         label = "Name",
         onValueChange = { name = it },
         isEnabled = true,
-        KeyboardOptions.Default.copy(
+        keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
         )
     )
 
-    Components_Template()
-}
-@Composable
-fun Components_Template(content: @Composable (() -> Unit)?=null){
+    Components_Template {
+        // Lógica para mostrar el modal al hacer clic en el botón
+        showModal = true
+    }
 
+    // Mostrar el modal si showModal es true
+    if (showModal) {
+        ReportedModal(
+            Titule = R.string.Name_Modal_Report,
+            Content = R.string.Content_Modal_Report,
+            ButtonText = R.string.Value_Button_Report
+        ) {
+            // Cierra el modal al presionar el botón de cerrar
+            showModal = false
+        }
+    }
+}
+
+@Composable
+fun Components_Template(content: @Composable (() -> Unit)? = null) {
     CheckHold()
     FieldsThemes()
-    //Button Submit
-    ButtonApp(stringResource(R.string.button_submit), { print("Hola") })
-    //Line diviser
+
+    // Botón Submit que abre el modal
+    ButtonApp(stringResource(R.string.button_submit)) {
+        content?.invoke() // Invoca el contenido que abre el modal
+    }
+
+    // Línea divisora
     Separetor()
 }

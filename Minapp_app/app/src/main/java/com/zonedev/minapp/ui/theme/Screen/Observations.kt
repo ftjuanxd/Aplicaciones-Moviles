@@ -10,9 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.R
-import com.zonedev.minapp.ui.theme.Components.BaseScreen
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.Separetor

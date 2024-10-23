@@ -3,8 +3,14 @@ package com.zonedev.minapp.ui.theme.Screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -23,6 +29,9 @@ fun ProfileScreen() {
 
 @Composable
 fun Components_Profile_Screen(){
+
+    var showDialog by remember { mutableStateOf(false) }
+
     Image(
         painter = painterResource(id = R.drawable.logo_user_sample),
         contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
@@ -69,5 +78,27 @@ fun Components_Profile_Screen(){
     )
 
     // Usamos ButtonApp aquí también
-    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button),{/*TODO*/})
+    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button)){showDialog=true}
+
+    // Componente Modal
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            title = { Text(text = stringResource(R.string.Name_Modal_Download)) },
+            text = { Text(text = stringResource(R.string.Content_Modal_Download)) },
+            confirmButton = {
+                // Usa el botón personalizado dentro del modal
+                ButtonApp(
+                    text = stringResource(R.string.Value_Button_Report),
+                    onClick = {
+                        showDialog = false // Cierra el modal cuando se hace clic en "Aceptar"
+                    },
+                    //modifier = Modifier.fillMaxWidth()
+                )
+            }
+        )
+    }
+
 }

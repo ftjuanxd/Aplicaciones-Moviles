@@ -65,9 +65,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.Screen.Chat
 import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.Observations
@@ -79,17 +79,21 @@ import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
 
 @Composable
-fun BaseScreen(opc : String = "home",navController: NavController) {
+fun BaseScreen(opc : String = "home", navController: NavController) {
     var opcClic by remember { mutableStateOf(opc) }
-    var isSidebarVisible by remember { mutableStateOf(false) } // Controlar la visibilidad del sidebar
+    var isSidebarVisible by remember { mutableStateOf(false) }
 
-    // Variables dinámicas para el contenido del Navbar - default de profile Screen
-    var title by remember { mutableStateOf(R.string.Descripcion_Navbar_Icon_Profile_Screen)}
+    // Variable para marcar si vienes desde "home"
+    var isFromHome by remember { mutableStateOf(false) }
+
+    // Variables dinámicas para el contenido del Navbar
+    var title by remember { mutableStateOf(R.string.Descripcion_Navbar_Icon_Profile_Screen) }
     var notificationIcon by remember { mutableStateOf(R.drawable.notificacion) }
     var logoIcon by remember { mutableStateOf(R.drawable.power_off) }
     var fontSizeTitule by remember { mutableStateOf(20.sp) }
     var SizeIcon by remember { mutableStateOf(40.dp) }
     var endPadding by remember { mutableStateOf(180.dp) }
+    var previousPage by remember { mutableStateOf("home") }
 
     // Actualizamos los valores de Navbar según la opción seleccionada
     when (opcClic) {
@@ -100,14 +104,33 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             fontSizeTitule = 20.sp
             SizeIcon = 40.dp
             endPadding = 100.dp
+            previousPage = "obs"
         }
         "veh" -> {
             title = R.string.Name_Interfaz_Vehicular
             notificationIcon = R.drawable.notificacion
-            logoIcon =  R.drawable.logo_home
+            logoIcon = R.drawable.logo_home
             fontSizeTitule = 25.sp
             SizeIcon = 40.dp
             endPadding = 130.dp
+            previousPage = "veh"
+        }
+        // Agregamos las otras opciones de la misma forma
+        "home" -> {
+            title = R.string.Descripcion_Navbar_Icon_Profile_Screen
+            notificationIcon = R.drawable.notificacion
+            logoIcon = R.drawable.power_off
+            fontSizeTitule = 20.sp
+            SizeIcon = 40.dp
+            endPadding = 180.dp
+        }
+        "chat" -> {
+            title = R.string.Name_Interfaz_Chat
+            notificationIcon = R.drawable.notificacion_disable
+            logoIcon = R.drawable.logo_home
+            fontSizeTitule = 20.sp
+            SizeIcon = 40.dp
+            endPadding = 200.dp
         }
         "per" -> {
             title = R.string.Name_Interfaz_Pedestrian_Access
@@ -116,6 +139,7 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             fontSizeTitule = 15.sp
             SizeIcon = 40.dp
             endPadding = 80.dp
+            previousPage = "per"
         }
         "ele" -> {
             title = R.string.Name_Interfaz_Element
@@ -124,6 +148,7 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             fontSizeTitule = 25.sp
             SizeIcon = 40.dp
             endPadding = 130.dp
+            previousPage = "ele"
         }
         "rep" -> {
             title = R.string.Name_Interfaz_Report
@@ -132,14 +157,7 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             fontSizeTitule = 20.sp
             SizeIcon = 40.dp
             endPadding = 200.dp
-        }
-        "home" -> {
-            title = R.string.Descripcion_Navbar_Icon_Profile_Screen
-            notificationIcon = R.drawable.notificacion
-            logoIcon =  R.drawable.power_off
-            fontSizeTitule = 20.sp
-            SizeIcon = 40.dp
-            endPadding = 180.dp
+            previousPage = "rep"
         }
     }
 
@@ -156,7 +174,6 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Pasamos el evento de clic del menú desde el Navbar
             Navbar(
                 Titule = title,
                 Activenotificacion = notificationIcon,
@@ -164,11 +181,12 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
                 fontSizeTitule = fontSizeTitule,
                 SizeIcon = SizeIcon,
                 endPadding = endPadding,
-                onMenuClick = { isSidebarVisible = !isSidebarVisible }, // Alternar visibilidad del sidebar
+                onMenuClick = { isSidebarVisible = !isSidebarVisible },
                 onItemClick = { clickedOption ->
-                    opcClic = clickedOption // Actualizar la opción clickeada
+                    opcClic = clickedOption
                 },
-                navController
+                navController,
+                previousPage =  previousPage
             )
 
             Spacer(modifier = Modifier.height(50.dp))
@@ -178,11 +196,11 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Navegar según la opción clickeada
                 when (opcClic) {
                     "home" -> ProfileScreen()
                     "obs" -> Observations()
                     "veh" -> Vehicular()
+                    "chat" -> Chat()
                     "per" -> Personal()
                     "ele" -> Element()
                     "rep" -> ScreenReport()
@@ -190,24 +208,23 @@ fun BaseScreen(opc : String = "home",navController: NavController) {
             }
         }
 
-        // Fondo semi-transparente que resalta el sidebar
+        // Sidebar y su fondo
         if (isSidebarVisible) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 56.dp)
                     .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable { isSidebarVisible = false } // Al hacer clic en el fondo, se cierra el sidebar
+                    .clickable { isSidebarVisible = false }
             )
         }
 
-        // Sidebar con animación
         if (isSidebarVisible) {
             SideBar(
                 isVisible = isSidebarVisible,
                 onItemClick = { clickedOption ->
                     opcClic = clickedOption
-                    isSidebarVisible = false // Oculta el sidebar después de hacer clic
+                    isSidebarVisible = false
                 }
             )
         }
@@ -224,6 +241,7 @@ fun Separetor() {
     )
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(
@@ -237,20 +255,28 @@ fun CustomTextField(
     pdHeight: Dp? = null,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    bitmap: Bitmap? = null // Nuevo parámetro para la imagen capturada
+    bitmap: Bitmap? = null, // Imagen capturada
+    isUser: Boolean? = null // Nuevo parámetro opcional
 ) {
+    // Determinamos la alineación según isUser
+    val alignmentModifier = when (isUser) {
+        true -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.End) // Alineado a la derecha si es del usuario
+        false -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.Start) // Alineado a la izquierda si no es del usuario
+        else -> Modifier.fillMaxWidth() // Alineado por defecto si no se pasa ningún valor
+    }
+
+    // Aplicamos el modifier junto con el nuevo alignmentModifier
     TextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = label) },
         enabled = isEnabled,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = alignmentModifier
+            //.then(modifier) // Se combina el alignmentModifier con el resto del modifier pasado
             .padding(vertical = 8.dp)
             .border(2.dp, primary, RoundedCornerShape(12.dp))
             .let { if (pdHeight != null) it.height(pdHeight) else it }
             .clickable {
-                // Solo se ejecuta si onClick no es null
                 onClick?.invoke()
             },
         keyboardOptions = keyboardOptions,
@@ -263,7 +289,7 @@ fun CustomTextField(
                     modifier = Modifier.size(40.dp)
                 )
             } else if (trailingIcon != null) {
-                // Si no hay imagen, mostrar el ícono habitual
+                // Mostrar el ícono habitual si no hay imagen
                 Icon(
                     painter = painterResource(id = trailingIcon),
                     contentDescription = null,
@@ -277,10 +303,11 @@ fun CustomTextField(
             focusedIndicatorColor = Color.Transparent,
             disabledLabelColor = Color.Transparent,
             containerColor = background,
-            disabledTextColor = MaterialTheme.colorScheme.onSurface // Color predeterminado para texto deshabilitado
+            disabledTextColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }
+
 
 @Composable
 fun Navbar(
@@ -292,7 +319,8 @@ fun Navbar(
     endPadding: Dp,
     onMenuClick: () -> Unit, // Para manejar el clic en el menú
     onItemClick: (String) -> Unit, // Manejar los clics de los ítems
-    navController: NavController
+    navController: NavController,
+    previousPage : String
 ) {
     Row(
         modifier = Modifier
@@ -325,7 +353,12 @@ fun Navbar(
                 modifier = Modifier
                     .size(SizeIcon)
                     .clickable {
-                        onItemClick("chat") // Notificación
+                        if (Activenotificacion == R.drawable.notificacion_disable) {
+                            // Vuelve a la pantalla anterior
+                            onItemClick(previousPage)
+                        } else {
+                            onItemClick("chat")
+                        }
                     }
             )
             Icon(
@@ -342,6 +375,7 @@ fun Navbar(
                     },
                 tint = colorResource(R.color.background)
             )
+
         }
     }
 }
@@ -349,14 +383,15 @@ fun Navbar(
 @Composable
 fun ButtonApp(
     text: String,
-    onClick: @Composable () -> Unit,
+    onClick: () -> Unit,
+    //modifier: Modifier = Modifier solo si el diseno base no ocupa todo el espacio del modal
 ) {
     Button(
-        onClick = {onClick},
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(Color.Blue),
+        colors = ButtonDefaults.buttonColors(primary),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(text = text, color = Color.White, fontSize = 18.sp)
@@ -805,60 +840,6 @@ fun SideBar(
                     }
             )
             Spacer(modifier = Modifier.height(10.dp))
-        }
-    }
-}
-
-//Modal
-@Composable
-fun ReportedModal(
-    @StringRes Titule: Int,
-    @StringRes Content: Int,
-    @StringRes ButtonText: Int,
-    onClose: () -> Unit // Función para cerrar el modal
-) {
-    // Este es el Dialog que muestra el modal
-    Dialog(onDismissRequest = { onClose() }) {
-        // Fondo semitransparente
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-        ) {
-            // Contenido del modal
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-                    .background(Color.White, RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(Titule),
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(Content),
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(bottom = 6.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ButtonApp(stringResource(ButtonText)) {
-                        onClose() // Cierra el modal cuando se presiona el botón
-                    }
-                }
-            }
         }
     }
 }

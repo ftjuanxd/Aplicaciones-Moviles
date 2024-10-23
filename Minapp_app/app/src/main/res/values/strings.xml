@@ -37,4 +37,9 @@
     <string name="Name_Modal_Report">REPORTED</string>
     <string name="Content_Modal_Report">The report was done</string>
     <string name="Value_Button_Report">CLOSE</string>
+    <string name="Name_Modal_Download">DOWNLOAD</string>
+    <string name="Content_Modal_Download">The manual was downloaded</string>
+    <string name="Label_Value_Central">Central</string>
+    <string name="Label_Value_Employ">Carlos</string>
+    <string name="Name_Interfaz_Chat">Chat</string>
 </resources>

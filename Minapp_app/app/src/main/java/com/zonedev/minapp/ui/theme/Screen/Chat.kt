@@ -36,11 +36,11 @@ fun ComponentsChat(){
     data class Item(val value: String, val label: String)
 
     val values = listOf(
-        Item("Con respecto a su problema el supervisor esta en camino",stringResource(R.string.Label_Value_Central)),
-        Item("Gracias, estare al tanto", stringResource(R.string.Label_Value_Employ)),
-        Item("Me confirma la llegada",stringResource(R.string.Label_Value_Central)),
-        Item("Si ya llego estamos solucinando las cosas",stringResource(R.string.Label_Value_Employ)),
-        Item("Envie imagenes sobre la solucion al problema",stringResource(R.string.Label_Value_Central))
+        Item("Con respecto a su problema el supervisor está en camino", stringResource(R.string.Label_Value_Central)),
+        Item("Gracias, estaré al tanto", stringResource(R.string.Label_Value_Employ)),
+        Item("Me confirma la llegada", stringResource(R.string.Label_Value_Central)),
+        Item("Si ya llegó, estamos solucionando las cosas", stringResource(R.string.Label_Value_Employ)),
+        Item("Envié imágenes sobre la solución al problema", stringResource(R.string.Label_Value_Central))
     )
 
     var typetext by remember { mutableStateOf("") }
@@ -58,14 +58,19 @@ fun ComponentsChat(){
 
         values.forEach { item ->
             Row(
-                horizontalArrangement = if (item.label != "central") Arrangement.End else Arrangement.Start // Alinea según el remitente
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (item.label == stringResource(R.string.Label_Value_Central)) {
+                    Arrangement.Start // Alinea a la izquierda si es "central"
+                } else {
+                    Arrangement.End   // Alinea a la derecha si es "usuario"
+                }
             ) {
                 CustomTextField(
                     value = item.value,
                     onValueChange = {},
                     label = item.label,
                     isEnabled = false,
-                    isUser = (item.label == "central")
+                    isUser = (item.label != stringResource(R.string.Label_Value_Central)) // Detecta si es el usuario
                 )
             }
         }

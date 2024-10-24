@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -61,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -77,6 +79,7 @@ import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
+import com.zonedev.minapp.ui.theme.text
 
 @Composable
 fun BaseScreen(opc : String = "home", navController: NavController) {
@@ -160,7 +163,6 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
             previousPage = "rep"
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -173,7 +175,6 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Navbar(
                 Titule = title,
                 Activenotificacion = notificationIcon,
@@ -188,9 +189,7 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
                 navController,
                 previousPage =  previousPage
             )
-
             Spacer(modifier = Modifier.height(50.dp))
-
             Column(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.Top,
@@ -207,7 +206,6 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
                 }
             }
         }
-
         // Sidebar y su fondo
         if (isSidebarVisible) {
             Box(
@@ -218,7 +216,6 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
                     .clickable { isSidebarVisible = false }
             )
         }
-
         if (isSidebarVisible) {
             SideBar(
                 isVisible = isSidebarVisible,
@@ -231,7 +228,6 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
     }
 }
 
-
 @Composable
 fun Separetor() {
     Divider(
@@ -240,7 +236,6 @@ fun Separetor() {
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -264,12 +259,11 @@ fun CustomTextField(
         false -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.Start) // Alineado a la izquierda si no es del usuario
         else -> Modifier.fillMaxWidth() // Alineado por defecto si no se pasa ningún valor
     }
-
     // Aplicamos el modifier junto con el nuevo alignmentModifier
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label) },
+        label = { Text(text = label,color= color_component) },
         enabled = isEnabled,
         modifier = alignmentModifier
             //.then(modifier) // Se combina el alignmentModifier con el resto del modifier pasado
@@ -307,7 +301,6 @@ fun CustomTextField(
         )
     )
 }
-
 
 @Composable
 fun Navbar(
@@ -375,7 +368,6 @@ fun Navbar(
                     },
                 tint = colorResource(R.color.background)
             )
-
         }
     }
 }
@@ -426,7 +418,6 @@ fun UploadFileScreen() {
                     filePickerLauncher.launch(arrayOf("image/*"))
                 }
         )
-
         // Mostrar la ruta del archivo seleccionado si existe
         fileUri?.let {
             Spacer(modifier = Modifier.height(16.dp))
@@ -608,7 +599,8 @@ fun DropdownMenu() {
 
     Box(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .background(background),
         contentAlignment = Alignment.Center
     ) {
         Button(
@@ -631,8 +623,9 @@ fun DropdownMenu() {
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .fillMaxWidth()
+                .width(380.dp)
                 .padding(12.dp)
+                .align(alignment = Alignment.Center)
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
@@ -649,7 +642,10 @@ fun DropdownMenu() {
     Spacer(modifier = Modifier.height(20.dp))
 
     // Mostrar contenido dependiendo de la opción seleccionada
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         when (selectedOption) {
                 "Pedestrian Access" -> PaginationScreen()
                 "Vehicular" -> PaginationScreen()
@@ -671,7 +667,7 @@ fun Pagination(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .border(2.dp, primary)
+            .border(2.dp, primary, shape = RoundedCornerShape(8.dp))
             .background(primary)
     ) {
         // Botón de "Previous"
@@ -723,14 +719,56 @@ fun ContentForPage(items: List<String>, itemsPerPage: Int, currentPage: Int) {
     val startIndex = (currentPage - 1) * itemsPerPage
     val endIndex = minOf(startIndex + itemsPerPage, items.size)
 
+    // Controla si se muestra el modal
+    var showDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(2.dp, color_component, shape = RoundedCornerShape(2.dp))
+            .border(2.dp, color_component, shape = RoundedCornerShape(8.dp))
     ) {
         for (index in startIndex until endIndex) {
-            Text(text = items[index], modifier = Modifier.padding(8.dp))
+            Row(modifier = Modifier.fillMaxWidth().clickable {showDialog = true}){
+                Text(text = items[index], modifier = Modifier.padding(8.dp))
+            }
         }
+    }
+    // Componente Modal
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.Name_Modal_Report),
+                    color = primary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            },
+
+            text = { Text(
+                text = stringResource(R.string.Content_Modal_Report),
+                color = Color.Gray,
+                modifier = Modifier
+                    .padding(bottom = 6.dp)
+            ) },
+
+            confirmButton = {
+                // Usa el botón personalizado dentro del modal
+                ButtonApp(
+                    text = stringResource(R.string.Value_Button_Report),
+                    onClick = {
+                        showDialog = false // Cierra el modal cuando se hace clic en "Aceptar"
+                    },
+                    //modifier = Modifier.fillMaxWidth()
+                )
+            }
+        )
     }
 }
 

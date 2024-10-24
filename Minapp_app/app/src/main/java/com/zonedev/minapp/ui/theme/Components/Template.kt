@@ -54,7 +54,6 @@ fun Template_Text(IsScreenElement: Boolean = false, Label_Id: String = stringRes
     if (IsScreenElement) {
         CameraCapture(stringResource(R.string.Value_Label_Element))
     }
-
     CustomTextField(
         value = Id,
         label = Label_Id,
@@ -65,7 +64,6 @@ fun Template_Text(IsScreenElement: Boolean = false, Label_Id: String = stringRes
             imeAction = ImeAction.Next,
         )
     )
-
     // TextField Authorization
     CustomTextField(
         value = name,
@@ -77,6 +75,7 @@ fun Template_Text(IsScreenElement: Boolean = false, Label_Id: String = stringRes
             imeAction = ImeAction.Next,
         )
     )
+    Components_Template()
 }
 
 @Composable

@@ -11,6 +11,10 @@ composeBom = "2024.04.01"
 uiTextGoogleFonts = "1.7.2"
 composeMaterial3 = "1.0.0-alpha25"
 navigationCompose = "2.8.2"
+firebaseBom = "33.1.1"
+services = "4.4.2"
+crashlytics = "3.0.2"
+coil = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,8 +35,16 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-material3", version.ref = "composeMaterial3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = {module = "com.google.firebase:firebase-crashlytics" }
+firebase-auth = {module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
+
+coil = {module = "io.coil-kt:coil-compose", version.ref = "coil"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "services"}
+crashlytics = {id= "com.google.firebase.crashlytics", version.ref = "crashlytics"}
 

@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
-import com.zonedev.minapp.ui.theme.Components.Components_Template
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.Separetor
 import com.zonedev.minapp.ui.theme.Components.UploadFileScreen
@@ -33,10 +32,9 @@ fun Observations(){
 @Composable
 fun Components_Observations(){
     var subject by remember { mutableStateOf("") }
-    var observations by remember { mutableStateOf("") }
+    var observation by remember { mutableStateOf("") }
 
     var showDialog by remember { mutableStateOf(false) }
-
 
     //TextField Subject
     CustomTextField(
@@ -50,9 +48,9 @@ fun Components_Observations(){
         )
     )
     CustomTextField(
-        value = observations,
+        value = observation,
         label = stringResource(R.string.label_observations),
-        onValueChange = { observations = it },
+        onValueChange = { observation = it },
         isEnabled = true,
         KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
@@ -63,7 +61,10 @@ fun Components_Observations(){
     UploadFileScreen()
     Separetor()
     // Usamos ButtonApp aquí también
-    ButtonApp(stringResource(R.string.button_submit)) { showDialog = true }
+    ButtonApp(stringResource(R.string.button_submit)) {
+
+        showDialog = true
+    }
 
     // Mostrar el modal si showModal es true
 

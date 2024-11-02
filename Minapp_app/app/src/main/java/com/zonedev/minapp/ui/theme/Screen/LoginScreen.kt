@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,23 +25,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
-import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.bodyFontFamily
-import com.zonedev.minapp.ui.theme.primary
-
 
 // Login Screen
 @Composable
-fun LoginApp(navController: NavController) {
+fun LoginApp(navController: NavController, auth: FirebaseAuth, onLoginSuccess: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +48,7 @@ fun LoginApp(navController: NavController) {
     ) {
         BlobUi()
         Spacer(modifier = Modifier.height((-20).dp)) // Reduce la altura entre componentes
-        CustomLoginScreen(navController)
+        CustomLoginScreen(navController, auth, onLoginSuccess)
     }
 }
 
@@ -79,10 +76,10 @@ fun BlobUi() {
 }
 
 @Composable
-fun CustomLoginScreen(navController: NavController) {
+fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginSuccess: (String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    // Se crea el NavController para manejar la navegación
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -94,31 +91,53 @@ fun CustomLoginScreen(navController: NavController) {
         CustomTextField(
             value = email,
             label = stringResource(R.string.Label_name_input_user),
-            onValueChange = { email = it },
-            isEnabled = true,
-            KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-            ),
-            R.drawable.user_icon,
-            primary
+            onValueChange = { if (it.length <= 254) email = it },
+            isEnabled = true
         )
 
         CustomTextField(
             value = password,
             label = stringResource(R.string.Label_name_Input_password),
             onValueChange = { password = it },
-            isEnabled = true,
-            KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-            ),
-            R.drawable.lock_icon,
-            primary
+            isEnabled = true
         )
 
-        // Usamos ButtonApp en lugar de Button
-        ButtonApp(stringResource(R.string.name_button_login),{navController.navigate("profile")})
-        // Llamada al NavHost que maneja la navegación entre pantallas
+        ButtonApp(stringResource(R.string.name_button_login)) {
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val let = auth.currentUser ?.let { user ->
+                        onLoginSuccess(user.uid)
+                    }
+                } else {
+                    showDialog = true // Cambia el estado del diálogo a verdadero
+                    println("No se logró")
+                    email = ""
+                    password=""
+                }
+            }
+        }
+
+        // Muestra el modal si showDialog es verdadero
+        Modal(showDialog = showDialog, onDismiss = { showDialog = false })
+    }
+}
+
+@Composable
+fun Modal(showDialog: Boolean, onDismiss: () -> Unit) {
+    // Componente Modal
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(text = "Error Datos de Usuario Incorrecto") },
+            text = { Text(text = "Los datos de usuario son incorrectos. Por favor, inténtalo de nuevo.") },
+            confirmButton = {
+                // Usa el botón personalizado dentro del modal
+                ButtonApp(
+                    text = stringResource(R.string.Value_Button_Report),
+                    onClick = onDismiss,
+                    //modifier = Modifier.fillMaxWidth()
+                )
+            }
+        )
     }
 }

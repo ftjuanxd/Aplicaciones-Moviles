@@ -15,7 +15,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -70,19 +69,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Screen.Chat
-import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.Observations
+import com.zonedev.minapp.ui.theme.Screen.Personal
 import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.ScreenReport
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
+import com.zonedev.minapp.ui.theme.ViewModel.GuardiaViewModel
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
-import com.zonedev.minapp.ui.theme.text
 
 @Composable
-fun BaseScreen(opc : String = "home", navController: NavController) {
+fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewModel: GuardiaViewModel) {
     var opcClic by remember { mutableStateOf(opc) }
     var isSidebarVisible by remember { mutableStateOf(false) }
 
@@ -196,7 +195,7 @@ fun BaseScreen(opc : String = "home", navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 when (opcClic) {
-                    "home" -> ProfileScreen()
+                    "home" -> ProfileScreen(guardiaViewModel)
                     "obs" -> Observations()
                     "veh" -> Vehicular()
                     "chat" -> Chat()

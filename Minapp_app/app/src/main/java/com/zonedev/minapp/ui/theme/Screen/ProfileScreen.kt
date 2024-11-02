@@ -1,84 +1,128 @@
 package com.zonedev.minapp.ui.theme.Screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.wear.compose.material3.CircularProgressIndicator
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
-import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.ViewModel.GuardiaViewModel
 
 @Preview
 @Composable
-fun ProfileScreen() {
-    Components_Profile_Screen()
+fun ProfileScreen(viewModel: GuardiaViewModel = viewModel()) {
+    Components_Profile_Screen(viewModel)
 }
 
 @Composable
-fun Components_Profile_Screen(){
+fun Components_Profile_Screen(guardiaViewModel: GuardiaViewModel = viewModel()){
 
     var showDialog by remember { mutableStateOf(false) }
+    val guardia by guardiaViewModel.listaGuardias.collectAsState()
 
-    Image(
-        painter = painterResource(id = R.drawable.logo_user_sample),
-        contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
-        modifier = Modifier
-            .size(160.dp)
-            .padding(bottom = 24.dp)
-    )
+    // Imagen de perfil usando Coil
+    guardia.firstOrNull()?.image?.let { imageUrl ->
+        if (imageUrl.isNotEmpty()) {
+            SubcomposeAsyncImage(
+                model = imageUrl,
+                contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
+                modifier = Modifier
+                    .size(160.dp)
+                    .padding(bottom = 24.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            ) {
+                when (painter.state) {
+                    is AsyncImagePainter.State.Loading -> {
+                        CircularProgressIndicator()
+                        println("Cargando imagen...${painter.state}")
+                    }
+                    is AsyncImagePainter.State.Error -> {
+                        // Imagen por defecto en caso de error
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_user_sample),
+                            contentDescription = "Error loading image",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    else -> {
+                        SubcomposeAsyncImageContent()
+                    }
+                }
+            }
+        } else {
+            // Imagen por defecto si no hay URL
+            Image(
+                painter = painterResource(id = R.drawable.logo_user_sample),
+                contentDescription = stringResource(R.string.Descripcion_profileScreen_Image),
+                modifier = Modifier
+                    .size(160.dp)
+                    .padding(bottom = 24.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
 
     Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
 
+
     CustomTextField(
-        value = "Carlos Cesar Santa Maria",
+        value = guardia.firstOrNull()?.name ?: "Data not available",
         label = "Name",
         onValueChange = {},
-        isEnabled = false,
+        isEnabled = false
     )
     CustomTextField(
-        value = "31234567890",
+        value = guardia.firstOrNull()?.phone ?: "Data not available",
         label = "Phone",
         onValueChange = {},
-        isEnabled = false,
+        isEnabled = false
     )
     CustomTextField(
-        value = "1234567890",
+        value = guardia.firstOrNull()?.id ?: "Data not available",
         label = "N° Id",
         onValueChange = {},
-        isEnabled = false,
-
-        )
+        isEnabled = false
+    )
     CustomTextField(
-        value = "Male",
+        value = guardia.firstOrNull()?.genre ?: "Data not available",
         label = "Genre",
         onValueChange = {},
-        isEnabled = false,
+        isEnabled = false
     )
     CustomTextField(
-        value = "O+", label = "Rh", onValueChange = {}, isEnabled = false
-    )
-    CustomTextField(
-        value = "213456789",
-        label = "Code used",
+        value = guardia.firstOrNull()?.rh ?: "Data not available",
+        label = "Rh",
         onValueChange = {},
-        isEnabled = false,
+        isEnabled = false
     )
-
     // Usamos ButtonApp aquí también
-    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button)){showDialog=true}
+    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button)) { showDialog = true }
 
     // Componente Modal
     if (showDialog) {
@@ -100,5 +144,4 @@ fun Components_Profile_Screen(){
             }
         )
     }
-
 }

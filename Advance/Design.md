@@ -43,9 +43,13 @@ Primeramente esta entrega agrega la Screen Chat igual que su funcionalidad para 
 Para esta entrega se tuvo problemas con Firebase esto con respecto a firestore database, sin embargo se esta manejando y para una proxima entrega se entrega logica completa.
   ### Datos de Prueba
   Email = pruebas@gmail.com
+  
   password = pruebas1234
+  
   Email = Zone@gmail.com
+  
   password = zone234
+  
   Realizar esto sin dejar espacios, sino la aplicacion lo reconoce como uno diferente
 
   La ultima version se encuentra en la rama Zone, esta por el momento tiene toda las ultimas implementaciones asu vez de un error con respecto a la pantalla    Observations siendo este motivo unos componentes que se estan usando para cargar las imagenes

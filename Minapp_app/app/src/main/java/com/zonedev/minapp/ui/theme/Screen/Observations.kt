@@ -1,5 +1,6 @@
 package com.zonedev.minapp.ui.theme.Screen
 
+import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -18,24 +19,28 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.Separetor
 import com.zonedev.minapp.ui.theme.Components.UploadFileScreen
+import com.zonedev.minapp.ui.theme.Components.crearParametrosParaReporte
+import com.zonedev.minapp.ui.theme.ViewModel.ReporteViewModel
 import com.zonedev.minapp.ui.theme.primary
 
 @Composable
-fun Observations(){
-    Components_Observations()
+fun Observations(guardiaId: String){
+    Components_Observations(guardiaId)
 }
 @Composable
-fun Components_Observations(){
+fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel = viewModel()){
     var subject by remember { mutableStateOf("") }
     var observation by remember { mutableStateOf("") }
-
+    var tipo_report ="Observations"
     var showDialog by remember { mutableStateOf(false) }
 
+    var evidencias by remember { mutableStateOf<Uri?>(null) }
     //TextField Subject
     CustomTextField(
         value = subject,
@@ -58,11 +63,23 @@ fun Components_Observations(){
         ),
         pdHeight = 140.dp
     )
-    UploadFileScreen()
+    UploadFileScreen{ uri ->
+        // Aquí puedes subir la foto a Firebase usando la URI
+        evidencias  = uri
+    }
+
     Separetor()
     // Usamos ButtonApp aquí también
     ButtonApp(stringResource(R.string.button_submit)) {
+        val datos = mapOf(
+            "subject" to subject,
+            "observation" to observation,
+            "evidencias" to  evidencias?.toString(),
+        )
 
+        val parametros = crearParametrosParaReporte(tipo_report, datos)
+
+        reporteViewModel.crearReporte(tipo_report,parametros,guardiaId)
         showDialog = true
     }
 

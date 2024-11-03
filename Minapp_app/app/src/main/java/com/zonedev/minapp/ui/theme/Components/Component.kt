@@ -1,7 +1,9 @@
 package com.zonedev.minapp.ui.theme.Components
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,6 +69,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Screen.Chat
@@ -79,9 +83,15 @@ import com.zonedev.minapp.ui.theme.ViewModel.GuardiaViewModel
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
+import java.io.File
 
 @Composable
-fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewModel: GuardiaViewModel) {
+fun BaseScreen(
+    opc: String = "home",
+    navController: NavController,
+    guardiaViewModel: GuardiaViewModel,
+    guardiaId: String
+) {
     var opcClic by remember { mutableStateOf(opc) }
     var isSidebarVisible by remember { mutableStateOf(false) }
 
@@ -196,12 +206,12 @@ fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewMo
             ) {
                 when (opcClic) {
                     "home" -> ProfileScreen(guardiaViewModel)
-                    "obs" -> Observations()
-                    "veh" -> Vehicular()
+                    "obs" -> Observations(guardiaId)
+                    "veh" -> Vehicular(guardiaId)
                     "chat" -> Chat()
-                    "per" -> Personal()
-                    "ele" -> Element()
-                    "rep" -> ScreenReport()
+                    "per" -> Personal(guardiaId)
+                    "ele" -> Element(guardiaId)
+                    "rep" -> ScreenReport(guardiaId)
                 }
             }
         }
@@ -210,6 +220,7 @@ fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewMo
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
                     .padding(top = 56.dp)
                     .background(Color.Black.copy(alpha = 0.5f))
                     .clickable { isSidebarVisible = false }
@@ -317,6 +328,7 @@ fun Navbar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .height(56.dp)
             .background(primary)
             .padding(10.dp),
@@ -390,22 +402,39 @@ fun ButtonApp(
 }
 
 @Composable
-fun UploadFileScreen() {
-    // Estado para almacenar la URI del archivo seleccionado
+fun UploadFileScreen(
+    onPhotoTaken: (Uri) -> Unit // Callback para devolver la URI de la foto tomada
+) {
     var fileUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Registro del lanzador de actividad para seleccionar archivos
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri: Uri? ->
-            fileUri = uri // Se actualiza el estado con la URI seleccionada
+    val context = LocalContext.current
+    val imageFile = File(context.cacheDir, "temp_image.jpg")
+
+    // Crear un URI temporal para la imagen
+    val imageUri = remember {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            imageFile
+        )
+    }
+
+    // Registro del lanzador para tomar una foto
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success: Boolean ->
+            if (success) {
+                fileUri = imageUri // Actualiza la URI del archivo con la imagen tomada
+                onPhotoTaken(imageUri) // Llama al callback con la URI de la foto
+            } else {
+                Log.e("UploadFileScreen", "Error al tomar la foto")
+            }
         }
     )
-    // Columna principal para organizar los elementos
+
     Column {
-        // OutlinedTextField simula el área de carga de archivos
         CustomTextField(
-            value = fileUri?.path ?: stringResource(R.string.Label_Upload_Files), // Muestra la ruta del archivo seleccionado o vacío
+            value = fileUri?.path ?: stringResource(R.string.Label_Upload_Files),
             onValueChange = {},
             label = stringResource(R.string.Label_Upload_Files),
             isEnabled = false,
@@ -413,14 +442,14 @@ fun UploadFileScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    // Al hacer clic en el OutlinedTextField se lanza el selector de archivos
-                    filePickerLauncher.launch(arrayOf("image/*"))
+                    // Lanza la cámara al hacer clic en el campo
+                    takePictureLauncher.launch(imageUri)
                 }
         )
-        // Mostrar la ruta del archivo seleccionado si existe
+
         fileUri?.let {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Archivo seleccionado: ${it.path}")
+            Text(text = "Foto tomada: ${it.path}")
         }
     }
 }
@@ -811,6 +840,7 @@ fun SideBar(
         modifier = Modifier
             .offset(x = offsetX)
             .fillMaxHeight()
+            .statusBarsPadding()
             .width(200.dp)
             .padding(top = 56.dp)
     ) {

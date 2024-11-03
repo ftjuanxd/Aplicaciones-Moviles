@@ -11,7 +11,7 @@ import com.zonedev.minapp.ui.theme.Components.Template_Scan
 import com.zonedev.minapp.ui.theme.Components.Template_Text
 
 @Composable
-fun Element() {
+fun Element(guardiaId: String) {
     SegmentedButton(
         {
             Template_Scan(true, stringResource(R.string.Value_Label_Element))

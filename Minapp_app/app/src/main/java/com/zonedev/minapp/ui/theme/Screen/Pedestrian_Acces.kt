@@ -9,10 +9,10 @@ import com.zonedev.minapp.ui.theme.Components.Template_Text
 fun Personal(guardiaId: String) {
     SegmentedButton(
         {
-            Template_Scan()
+            Template_Scan(guardiaId = guardiaId)
         },
         {
-            Template_Text()
+            Template_Text(Tipo_Report = "Personal",guardiaId = guardiaId)
         }
     )
 }

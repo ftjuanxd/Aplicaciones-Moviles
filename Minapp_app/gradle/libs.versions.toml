@@ -15,8 +15,10 @@ firebaseBom = "33.1.1"
 services = "4.4.2"
 crashlytics = "3.0.2"
 coil = "2.7.0"
+googleplay = "18.4.0"
 
 [libraries]
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -42,7 +44,10 @@ firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
 
 coil = {module = "io.coil-kt:coil-compose", version.ref = "coil"}
 
+play-services-basement = {module = "com.google.android.gms:play-services-basement", version.ref = "googleplay"}
+
 [plugins]
+
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "services"}

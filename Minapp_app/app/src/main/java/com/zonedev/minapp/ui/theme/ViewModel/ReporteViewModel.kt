@@ -79,4 +79,19 @@ class ReporteViewModel : ViewModel() {
             }
         }
     }
+
+    suspend fun leerReportesPorGuardiaYTipo(guardiaId: String, tipo: String): List<Reporte> {
+        return try {
+            val snapshot = reportesCollection
+                .whereEqualTo("guardiaId", guardiaId)
+                .whereEqualTo("tipo", tipo)
+                .get().await()
+            snapshot.toObjects(Reporte::class.java)
+        } catch (e: Exception) {
+            println("Error al leer reportes: ${e.message}")
+            emptyList()
+        }
+    }
+
+
 }

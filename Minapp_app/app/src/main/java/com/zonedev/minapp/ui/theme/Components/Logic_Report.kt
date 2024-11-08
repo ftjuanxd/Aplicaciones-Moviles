@@ -1,5 +1,12 @@
 package com.zonedev.minapp.ui.theme.Components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import com.zonedev.minapp.ui.theme.Model.Reporte
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 fun crearParametrosParaReporte(tipo: String, datos: Map<String, Any?>): Map<String, Any> {
     return when (tipo) {
         "Observations" -> {
@@ -9,28 +16,68 @@ fun crearParametrosParaReporte(tipo: String, datos: Map<String, Any?>): Map<Stri
                 "evidencias" to (datos["evidencias"] ?: "Ninguna"),
             )
         }
-        "Acceso a Personas" -> {
+        "Personal" -> {
             mapOf(
-                "personaNombre" to (datos["personaNombre"] ?: ""),
-                "horaEntrada" to (datos["horaEntrada"] ?: System.currentTimeMillis()),
-                "autorizadoPor" to (datos["autorizadoPor"] ?: "")
+                "id_placa" to (datos["id_placa"] ?: ""),
+                "name" to (datos["name"] ?:""),
+                "destino" to (datos["destino"] ?: ""),
+                "autorizacion" to (datos["autorizacion"]?: ""),
+                "descripcion" to (datos["descripcion"]?: "")
             )
         }
         "Vehicular" -> {
             mapOf(
-                "placa" to (datos["placa"] ?: ""),
-                "marca" to (datos["marca"] ?: ""),
-                "modelo" to (datos["modelo"] ?: ""),
-                "horaIngreso" to (datos["horaIngreso"] ?: System.currentTimeMillis())
+                "id_placa" to (datos["id_placa"] ?: ""),
+                "name" to (datos["name"] ?: ""),
+                "destino" to (datos["destino"] ?: ""),
+                "autorizacion" to (datos["autorizacion"]?: ""),
+                "descripcion" to (datos["descripcion"]?: "")
             )
         }
-        "Elementos" -> {
+        "Elemento" -> {
             mapOf(
-                "elementoNombre" to (datos["elementoNombre"] ?: ""),
-                "cantidad" to (datos["cantidad"] ?: 0),
-                "estado" to (datos["estado"] ?: "bueno")
+                "imgelement" to (datos["imgelement"] ?: ""),
+                "id_placa" to (datos["id_placa"] ?: ""),
+                "name" to (datos["name"] ?:""),
+                "destino" to (datos["destino"] ?: ""),
+                "autorizacion" to (datos["autorizacion"]?: ""),
+                "descripcion" to (datos["descripcion"]?: "")
             )
         }
         else -> emptyMap() // Manejo de casos de tipos desconocidos
+    }
+}
+
+@Composable
+fun MostrarReporte(reporte: Reporte) {
+    Column {
+        Text(text="${formatearFecha(reporte.timestamp)}")
+
+        // Verificar si `parametros` tiene algún valor.
+        if (reporte.parametros.isNotEmpty()) {
+            reporte.parametros.forEach { (key, value) ->
+                Text(text = "$key: $value") // Muestra cada clave y valor en `parametros`
+            }
+        } else {
+            Text(text = "No hay parámetros disponibles")
+        }
+    }
+}
+
+
+fun formatearFecha(timestamp: Long): String {
+    val sdf = SimpleDateFormat("EEE, d MMM yyyy - h:mm a", Locale.getDefault())
+    return sdf.format(timestamp)
+}
+fun obtenerParametro(reporte: Reporte, clave: String): String {
+    return reporte.parametros[clave]?.toString() ?: "Parámetro no encontrado"
+}
+fun obtenerClavePorTipo(tipo: String): String {
+    return when (tipo) {
+        "Observations" -> "subject"
+        "Personal" -> "id_placa"
+        "Vehicular" -> "id_placa"
+        "Elementos" -> "id_placa"
+        else -> "unknown"
     }
 }

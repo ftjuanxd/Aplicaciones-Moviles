@@ -36,7 +36,6 @@ import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.bodyFontFamily
 
-// Login Screen
 @Composable
 fun LoginApp(navController: NavController, auth: FirebaseAuth, onLoginSuccess: (String) -> Unit) {
     Column(
@@ -105,14 +104,14 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
         ButtonApp(stringResource(R.string.name_button_login)) {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val let = auth.currentUser ?.let { user ->
-                        onLoginSuccess(user.uid)
+                    auth.currentUser?.let { user ->
+                        onLoginSuccess(user.uid) // Pasa el userId de vuelta al MainActivity
                     }
                 } else {
-                    showDialog = true // Cambia el estado del diálogo a verdadero
+                    showDialog = true
                     println("No se logró")
                     email = ""
-                    password=""
+                    password = ""
                 }
             }
         }
@@ -124,18 +123,15 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
 
 @Composable
 fun Modal(showDialog: Boolean, onDismiss: () -> Unit) {
-    // Componente Modal
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = { Text(text = "Error Datos de Usuario Incorrecto") },
             text = { Text(text = "Los datos de usuario son incorrectos. Por favor, inténtalo de nuevo.") },
             confirmButton = {
-                // Usa el botón personalizado dentro del modal
                 ButtonApp(
                     text = stringResource(R.string.Value_Button_Report),
                     onClick = onDismiss,
-                    //modifier = Modifier.fillMaxWidth()
                 )
             }
         )

@@ -11,10 +11,10 @@ import com.zonedev.minapp.ui.theme.Components.Template_Text
 fun Vehicular(guardiaId: String) {
     SegmentedButton(
         {
-            Template_Scan(vals = stringResource(R.string.Value_Label_Vehicular_Scan))
+            Template_Scan(vals = stringResource(R.string.Value_Label_Vehicular_Scan), guardiaId = guardiaId)
         },
         {
-            Template_Text(Label_Id = stringResource(R.string.Value_Label_Vehicular))
+            Template_Text(Label_Id = stringResource(R.string.Value_Label_Vehicular), Tipo_Report = "Vehicular",guardiaId = guardiaId)
         }
     )
 }

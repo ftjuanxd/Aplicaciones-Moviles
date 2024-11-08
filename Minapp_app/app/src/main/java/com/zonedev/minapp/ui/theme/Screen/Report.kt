@@ -5,5 +5,5 @@ import com.zonedev.minapp.ui.theme.Components.DropdownMenu
 
 @Composable
 fun ScreenReport(guardiaId: String){
-    DropdownMenu()
+    DropdownMenu(guardiaId)
 }

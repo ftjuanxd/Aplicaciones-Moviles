@@ -24,7 +24,6 @@ import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Components.ButtonApp
 import com.zonedev.minapp.ui.theme.Components.CustomTextField
 import com.zonedev.minapp.ui.theme.Components.Separetor
-import com.zonedev.minapp.ui.theme.Components.UploadFileScreen
 import com.zonedev.minapp.ui.theme.Components.crearParametrosParaReporte
 import com.zonedev.minapp.ui.theme.ViewModel.ReporteViewModel
 import com.zonedev.minapp.ui.theme.primary
@@ -63,10 +62,10 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
         ),
         pdHeight = 140.dp
     )
-    UploadFileScreen{ uri ->
-        // Aquí puedes subir la foto a Firebase usando la URI
-        evidencias  = uri
-    }
+    /*CaptureImageScreen("evidencias") { base64Image ->
+        // Guarda el string base64 en tu colección de Firestore
+        evidencias = base64Image
+    }*/
 
     Separetor()
     // Usamos ButtonApp aquí también
@@ -74,12 +73,15 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
         val datos = mapOf(
             "subject" to subject,
             "observation" to observation,
-            "evidencias" to  evidencias?.toString(),
+            "evidencias" to  evidencias.toString()
         )
 
         val parametros = crearParametrosParaReporte(tipo_report, datos)
 
         reporteViewModel.crearReporte(tipo_report,parametros,guardiaId)
+        subject = ""
+        observation = ""
+        evidencias = null
         showDialog = true
     }
 

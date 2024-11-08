@@ -44,9 +44,10 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("login") {
                         LoginApp(navController, auth) { userId ->
+                            idguard = userId // Guarda el userId en la variable
                             // Cargar el guardia desde el ViewModel de forma asincrónica
                             coroutineScope.launch {
-                                idguard = guardiaViewModel.getGuardiaById(userId).toString()
+                                guardiaViewModel.getGuardiaById(userId)
                                 navController.navigate("profile")
                             }
                         }

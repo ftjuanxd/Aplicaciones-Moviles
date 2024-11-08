@@ -60,7 +60,7 @@ fun BlobUi() {
             contentDescription = null,
             contentScale = ContentScale.Crop,
             alignment = Alignment.TopEnd,
-            modifier = Modifier.absoluteOffset(x = (-40).dp, y = (-190).dp)
+            modifier = Modifier.absoluteOffset(x = (-80).dp, y = (-160).dp)
         )
         Text(
             text = stringResource(R.string.blob_ui_text),
@@ -79,6 +79,7 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") } // Variable para el mensaje de error
 
     Column(
         modifier = Modifier
@@ -102,32 +103,39 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
         )
 
         ButtonApp(stringResource(R.string.name_button_login)) {
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    auth.currentUser?.let { user ->
-                        onLoginSuccess(user.uid) // Pasa el userId de vuelta al MainActivity
+            if (email.isBlank() || password.isBlank()) {
+                // Muestra un mensaje de error si los campos están vacíos
+                errorMessage = "Ingrese el correo electrónico como la contraseña."
+                showDialog = true
+            } else {
+                // Realiza la autenticación si ambos campos tienen valores
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        auth.currentUser?.let { user ->
+                            onLoginSuccess(user.uid) // Pasa el userId de vuelta al MainActivity
+                        }
+                    } else {
+                        errorMessage = "Los datos de usuario son incorrectos. Por favor, inténtalo de nuevo."
+                        showDialog = true
+                        email = ""
+                        password = ""
                     }
-                } else {
-                    showDialog = true
-                    println("No se logró")
-                    email = ""
-                    password = ""
                 }
             }
         }
 
         // Muestra el modal si showDialog es verdadero
-        Modal(showDialog = showDialog, onDismiss = { showDialog = false })
+        Modal(showDialog = showDialog, onDismiss = { showDialog = false }, errorMessage = errorMessage)
     }
 }
 
 @Composable
-fun Modal(showDialog: Boolean, onDismiss: () -> Unit) {
+fun Modal(showDialog: Boolean, onDismiss: () -> Unit, errorMessage: String) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text(text = "Error Datos de Usuario Incorrecto") },
-            text = { Text(text = "Los datos de usuario son incorrectos. Por favor, inténtalo de nuevo.") },
+            title = { Text(text = "Error") },
+            text = { Text(text = errorMessage) },
             confirmButton = {
                 ButtonApp(
                     text = stringResource(R.string.Value_Button_Report),

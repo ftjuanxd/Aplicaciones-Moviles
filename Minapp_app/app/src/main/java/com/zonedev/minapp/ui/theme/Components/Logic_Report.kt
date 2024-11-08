@@ -11,37 +11,37 @@ fun crearParametrosParaReporte(tipo: String, datos: Map<String, Any?>): Map<Stri
     return when (tipo) {
         "Observations" -> {
             mapOf(
-                "subject" to (datos["subject"] ?: ""),
-                "observation" to (datos["observation"] ?: ""),
-                "evidencias" to (datos["evidencias"] ?: "Ninguna"),
+                "Subject" to (datos["Subject"] ?: ""),
+                "Observation" to (datos["Observation"] ?: ""),
+                "Evidencias" to (datos["Evidencias"] ?: "Ninguna"),
             )
         }
         "Personal" -> {
             mapOf(
-                "id_placa" to (datos["id_placa"] ?: ""),
-                "name" to (datos["name"] ?:""),
-                "destino" to (datos["destino"] ?: ""),
-                "autorizacion" to (datos["autorizacion"]?: ""),
-                "descripcion" to (datos["descripcion"]?: "")
+                "Id_placa" to (datos["Id_placa"] ?: ""),
+                "Name" to (datos["Name"] ?:""),
+                "Destino" to (datos["Destino"] ?: ""),
+                "Autorizacion" to (datos["Autorizacion"]?: ""),
+                "Descripcion" to (datos["Descripcion"]?: "")
             )
         }
         "Vehicular" -> {
             mapOf(
-                "id_placa" to (datos["id_placa"] ?: ""),
-                "name" to (datos["name"] ?: ""),
-                "destino" to (datos["destino"] ?: ""),
-                "autorizacion" to (datos["autorizacion"]?: ""),
-                "descripcion" to (datos["descripcion"]?: "")
+                "Id_placa" to (datos["Id_placa"] ?: ""),
+                "Name" to (datos["Name"] ?:""),
+                "Destino" to (datos["Destino"] ?: ""),
+                "Autorizacion" to (datos["Autorizacion"]?: ""),
+                "Descripcion" to (datos["Descripcion"]?: "")
             )
         }
         "Elemento" -> {
             mapOf(
-                "imgelement" to (datos["imgelement"] ?: ""),
-                "id_placa" to (datos["id_placa"] ?: ""),
-                "name" to (datos["name"] ?:""),
-                "destino" to (datos["destino"] ?: ""),
-                "autorizacion" to (datos["autorizacion"]?: ""),
-                "descripcion" to (datos["descripcion"]?: "")
+                "Imgelement" to (datos["Imgelement"] ?: ""),
+                "Id_placa" to (datos["Id_placa"] ?: ""),
+                "Name" to (datos["Name"] ?:""),
+                "Destino" to (datos["Destino"] ?: ""),
+                "Autorizacion" to (datos["Autorizacion"]?: ""),
+                "Descripcion" to (datos["Descripcion"]?: "")
             )
         }
         else -> emptyMap() // Manejo de casos de tipos desconocidos
@@ -49,14 +49,24 @@ fun crearParametrosParaReporte(tipo: String, datos: Map<String, Any?>): Map<Stri
 }
 
 @Composable
-fun MostrarReporte(reporte: Reporte) {
-    Column {
-        Text(text="${formatearFecha(reporte.timestamp)}")
+fun MostrarReporte(reporte: Reporte,tipo: String) {
+    val ordenParametros = when(tipo){
+        "Observations" -> listOf("Subject", "Observation", "Evidencias")
+        "Personal" -> listOf("Id_placa", "Name", "Destino", "Autorizacion", "Descripcion")
+        "Vehicular" -> listOf("Id_placa", "Name", "Destino", "Autorizacion", "Descripcion")
+        "Elemento" -> listOf("Imgelement", "Id_placa", "Name", "Destino", "Autorizacion", "Descripcion")
+        else -> listOf()
+    }
 
-        // Verificar si `parametros` tiene algún valor.
+    Column {
+        Text(text = "${formatearFecha(reporte.timestamp)}")
+
         if (reporte.parametros.isNotEmpty()) {
-            reporte.parametros.forEach { (key, value) ->
-                Text(text = "$key: $value") // Muestra cada clave y valor en `parametros`
+            // Itera sobre la lista de claves en orden
+            ordenParametros.forEach { key ->
+                reporte.parametros[key]?.let { value ->
+                    Text(text = "$key: $value") // Muestra cada clave y valor en orden específico
+                }
             }
         } else {
             Text(text = "No hay parámetros disponibles")
@@ -74,10 +84,10 @@ fun obtenerParametro(reporte: Reporte, clave: String): String {
 }
 fun obtenerClavePorTipo(tipo: String): String {
     return when (tipo) {
-        "Observations" -> "subject"
-        "Personal" -> "id_placa"
-        "Vehicular" -> "id_placa"
-        "Elementos" -> "id_placa"
+        "Observations" -> "Subject"
+        "Personal" -> "Id_placa"
+        "Vehicular" -> "Id_placa"
+        "Elementos" -> "Id_placa"
         else -> "unknown"
     }
 }

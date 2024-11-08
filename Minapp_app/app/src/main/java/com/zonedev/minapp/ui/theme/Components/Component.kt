@@ -53,6 +53,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -461,14 +462,14 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
 }
 
 @Composable
-fun CheckHold() {
+fun CheckHold(): MutableState<Boolean> {
     // Estado del Checkbox
-    var isChecked by remember { mutableStateOf(false) }
+    val isChecked = remember { mutableStateOf(false) }
 
     // Contenedor con el Checkbox y un Text para mostrar el estado
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(end=220.dp)
+        modifier = Modifier.padding(end = 220.dp)
     ) {
         Box(
             modifier = Modifier
@@ -477,12 +478,12 @@ fun CheckHold() {
                 .padding(4.dp)  // Espacio entre el borde y el checkbox
         ) {
             Checkbox(
-                checked = isChecked,
-                onCheckedChange = { isChecked = it }, // Actualiza el estado cuando se hace clic
+                checked = isChecked.value,
+                onCheckedChange = { isChecked.value = it }, // Actualiza el estado cuando se hace clic
                 colors = CheckboxDefaults.colors(
                     checkedColor = primary,        // Color cuando está marcado
-                    uncheckedColor = background,      // Color cuando está desmarcado
-                    checkmarkColor = background,      // Color del check
+                    uncheckedColor = background,   // Color cuando está desmarcado
+                    checkmarkColor = background    // Color del check
                 )
             )
         }
@@ -492,7 +493,11 @@ fun CheckHold() {
             fontSize = 15.sp
         )
     }
+
+    // Retornar el estado observable de isChecked
+    return isChecked
 }
+
 
 @Composable
 fun FieldsThemes(destiny:String,onDestinyChange: (String) -> Unit,auto:String,onAutoChange: (String) -> Unit,descrip:String,onDescripChange: (String) -> Unit){
@@ -770,7 +775,7 @@ fun ContentForPage(reportes: List<Reporte>, itemsPerPage: Int, currentPage: Int)
                     // Mostrar detalles del reporte seleccionado
                     LazyColumn {
                         item {
-                            MostrarReporte(reporte)
+                            MostrarReporte(reporte,reporte.tipo)
                         }
                     }
                 }
@@ -784,7 +789,6 @@ fun ContentForPage(reportes: List<Reporte>, itemsPerPage: Int, currentPage: Int)
         )
     }
 }
-
 @Composable
 fun SideBar(
     isVisible: Boolean,

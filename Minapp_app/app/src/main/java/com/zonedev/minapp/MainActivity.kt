@@ -22,6 +22,7 @@ import com.zonedev.minapp.ui.theme.Screen.MainScreen
 import com.zonedev.minapp.ui.theme.ViewModel.GuardiaViewModel
 import kotlinx.coroutines.launch
 
+
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var guardiaViewModel: GuardiaViewModel
@@ -30,7 +31,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         guardiaViewModel = GuardiaViewModel()
-
         enableEdgeToEdge()
         setContent {
             MinappTheme {

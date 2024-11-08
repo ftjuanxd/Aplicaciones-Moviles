@@ -59,9 +59,6 @@ dependencies {
 
     implementation(libs.coil)
 
-    implementation (libs.play.services.basement)
-
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

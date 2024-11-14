@@ -1,7 +1,11 @@
 package com.zonedev.minapp.ui.theme.Components
 
+
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -24,8 +28,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -46,6 +52,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,13 +69,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zonedev.minapp.R
+import com.zonedev.minapp.ui.theme.Model.Reporte
 import com.zonedev.minapp.ui.theme.Screen.Chat
 import com.zonedev.minapp.ui.theme.Screen.Element
 import com.zonedev.minapp.ui.theme.Screen.Observations
@@ -76,12 +85,18 @@ import com.zonedev.minapp.ui.theme.Screen.ProfileScreen
 import com.zonedev.minapp.ui.theme.Screen.ScreenReport
 import com.zonedev.minapp.ui.theme.Screen.Vehicular
 import com.zonedev.minapp.ui.theme.ViewModel.GuardiaViewModel
+import com.zonedev.minapp.ui.theme.ViewModel.ReporteViewModel
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
 
 @Composable
-fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewModel: GuardiaViewModel) {
+fun BaseScreen(
+    opc: String = "home",
+    navController: NavController,
+    guardiaViewModel: GuardiaViewModel,
+    guardiaId: String
+) {
     var opcClic by remember { mutableStateOf(opc) }
     var isSidebarVisible by remember { mutableStateOf(false) }
 
@@ -196,12 +211,12 @@ fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewMo
             ) {
                 when (opcClic) {
                     "home" -> ProfileScreen(guardiaViewModel)
-                    "obs" -> Observations()
-                    "veh" -> Vehicular()
+                    "obs" -> Observations(guardiaId)
+                    "veh" -> Vehicular(guardiaId)
                     "chat" -> Chat()
-                    "per" -> Personal()
-                    "ele" -> Element()
-                    "rep" -> ScreenReport()
+                    "per" -> Personal(guardiaId)
+                    "ele" -> Element(guardiaId)
+                    "rep" -> ScreenReport(guardiaId)
                 }
             }
         }
@@ -210,6 +225,7 @@ fun BaseScreen(opc : String = "home", navController: NavController,guardiaViewMo
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
                     .padding(top = 56.dp)
                     .background(Color.Black.copy(alpha = 0.5f))
                     .clickable { isSidebarVisible = false }
@@ -317,6 +333,7 @@ fun Navbar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .height(56.dp)
             .background(primary)
             .padding(10.dp),
@@ -390,42 +407,6 @@ fun ButtonApp(
 }
 
 @Composable
-fun UploadFileScreen() {
-    // Estado para almacenar la URI del archivo seleccionado
-    var fileUri by remember { mutableStateOf<Uri?>(null) }
-
-    // Registro del lanzador de actividad para seleccionar archivos
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri: Uri? ->
-            fileUri = uri // Se actualiza el estado con la URI seleccionada
-        }
-    )
-    // Columna principal para organizar los elementos
-    Column {
-        // OutlinedTextField simula el área de carga de archivos
-        CustomTextField(
-            value = fileUri?.path ?: stringResource(R.string.Label_Upload_Files), // Muestra la ruta del archivo seleccionado o vacío
-            onValueChange = {},
-            label = stringResource(R.string.Label_Upload_Files),
-            isEnabled = false,
-            pdHeight = 140.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    // Al hacer clic en el OutlinedTextField se lanza el selector de archivos
-                    filePickerLauncher.launch(arrayOf("image/*"))
-                }
-        )
-        // Mostrar la ruta del archivo seleccionado si existe
-        fileUri?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Archivo seleccionado: ${it.path}")
-        }
-    }
-}
-
-@Composable
 fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Composable () -> Unit) {
     // Estado que almacena qué botón está seleccionado (0 para Scan Id, 1 para Write)
     var selectedButton by remember { mutableStateOf(0) }
@@ -481,14 +462,14 @@ fun SegmentedButton(ScanComponent: @Composable () -> Unit, TextComponent: @Compo
 }
 
 @Composable
-fun CheckHold() {
+fun CheckHold(): MutableState<Boolean> {
     // Estado del Checkbox
-    var isChecked by remember { mutableStateOf(false) }
+    val isChecked = remember { mutableStateOf(false) }
 
     // Contenedor con el Checkbox y un Text para mostrar el estado
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(end=220.dp)
+        modifier = Modifier.padding(end = 220.dp)
     ) {
         Box(
             modifier = Modifier
@@ -497,12 +478,12 @@ fun CheckHold() {
                 .padding(4.dp)  // Espacio entre el borde y el checkbox
         ) {
             Checkbox(
-                checked = isChecked,
-                onCheckedChange = { isChecked = it }, // Actualiza el estado cuando se hace clic
+                checked = isChecked.value,
+                onCheckedChange = { isChecked.value = it }, // Actualiza el estado cuando se hace clic
                 colors = CheckboxDefaults.colors(
                     checkedColor = primary,        // Color cuando está marcado
-                    uncheckedColor = background,      // Color cuando está desmarcado
-                    checkmarkColor = background,      // Color del check
+                    uncheckedColor = background,   // Color cuando está desmarcado
+                    checkmarkColor = background    // Color del check
                 )
             )
         }
@@ -512,18 +493,19 @@ fun CheckHold() {
             fontSize = 15.sp
         )
     }
+
+    // Retornar el estado observable de isChecked
+    return isChecked
 }
 
+
 @Composable
-fun FieldsThemes() {
-    var destiny by remember { mutableStateOf("") }
-    var auto by remember { mutableStateOf("") }
-    var descrip by remember { mutableStateOf("") }
+fun FieldsThemes(destiny:String,onDestinyChange: (String) -> Unit,auto:String,onAutoChange: (String) -> Unit,descrip:String,onDescripChange: (String) -> Unit){
 
     CustomTextField(
         value = destiny,
         label = "Destiny",
-        onValueChange = { destiny = it },
+        onValueChange = onDestinyChange,
         isEnabled = true,
         KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
@@ -534,7 +516,7 @@ fun FieldsThemes() {
     CustomTextField(
         value = auto,
         label = "Authorization",
-        onValueChange = { auto = it },
+        onValueChange = onAutoChange,
         isEnabled = true,
         KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
@@ -545,7 +527,7 @@ fun FieldsThemes() {
     CustomTextField(
         value = descrip,
         label = "Description",
-        onValueChange = { descrip = it },
+        onValueChange = onDescripChange,
         isEnabled = true,
         KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
@@ -558,43 +540,63 @@ fun FieldsThemes() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraCapture(vals:String = stringResource(R.string.Value_Default_Label_Camera)) {
+fun CaptureImageScreen(
+    vals : String = stringResource(R.string.Value_Default_Label_Camera),
+    onImageCaptured: (Uri) -> Unit, // Callback para manejar la URI de la imagen capturada
+) {
     val context = LocalContext.current
-    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-    // Intent para capturar imagen
+    val contentResolver = context.contentResolver
     val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
-            capturedBitmap = bitmap
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            val uri = createImageFileUri(context)
+            uri?.let {
+                onImageCaptured(it)
+            }
         }
     }
-    // Custom TextField que muestra la imagen capturada
     CustomTextField(
         value = vals,
         onValueChange = {},
         isEnabled = false,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp),
-        label = "Upload File",
-        pdHeight = 120.dp,
-        onClick = {
-            // Llamar el intent de captura de foto
-            takePictureLauncher.launch(null)
-        },
-        bitmap = capturedBitmap // Pasar la imagen capturada al TextField
+            .padding(bottom = 10.dp)
+            .clickable {
+                // Llamar el intent de captura de foto
+                val uri = createImageFileUri(context)
+                if (uri != null) {
+                    takePictureLauncher.launch(uri)
+                }
+            },
+        label = stringResource(R.string.Label_Upload_Files),
+        pdHeight = 120.dp
     )
 }
 
-//Screen Report
+private fun createImageFileUri(context: Context): Uri? {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "new_image.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
+    }
+    return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenu() {
+fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewModel()) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Pedestrian Access") }
-    val options = listOf("Pedestrian Access", "Vehicular", "Element", "Observations")
+    val options = listOf("Personal", "Vehicular", "Elemento", "Observations")
+    var reportes by remember { mutableStateOf(emptyList<Reporte>()) } // Lista de reportes
+
+    // Actualizar la lista de reportes cada vez que cambia la opción seleccionada
+    LaunchedEffect(selectedOption) {
+        reportes = reporteViewModel.leerReportesPorGuardiaYTipo(guardiaId, selectedOption)
+    }
 
     Box(
         modifier = Modifier
@@ -637,21 +639,16 @@ fun DropdownMenu() {
             }
         }
     }
+
     Separetor()
     Spacer(modifier = Modifier.height(20.dp))
 
-    // Mostrar contenido dependiendo de la opción seleccionada
+    // Mostrar contenido de reportes de acuerdo con la opción seleccionada
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        when (selectedOption) {
-                "Pedestrian Access" -> PaginationScreen()
-                "Vehicular" -> PaginationScreen()
-                "Element" -> PaginationScreen()
-                "Observations" -> PaginationScreen()
-                else -> "Please select an option"
-            }
+        PaginationScreen(reportes)
     }
 }
 
@@ -714,12 +711,32 @@ fun Pagination(
 }
 
 @Composable
-fun ContentForPage(items: List<String>, itemsPerPage: Int, currentPage: Int) {
-    val startIndex = (currentPage - 1) * itemsPerPage
-    val endIndex = minOf(startIndex + itemsPerPage, items.size)
+fun PaginationScreen(reportes: List<Reporte>) {
+    var currentPage by remember { mutableStateOf(1) }
+    val itemsPerPage = 5
+    val totalPages = (reportes.size + itemsPerPage - 1) / itemsPerPage
 
-    // Controla si se muestra el modal
+    Column {
+        Pagination(
+            totalPages = totalPages,
+            currentPage = currentPage,
+            onPageChanged = { newPage -> currentPage = newPage }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ContentForPage(reportes = reportes, itemsPerPage = itemsPerPage, currentPage = currentPage)
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+@Composable
+fun ContentForPage(reportes: List<Reporte>, itemsPerPage: Int, currentPage: Int) {
+    val startIndex = (currentPage - 1) * itemsPerPage
+    val endIndex = minOf(startIndex + itemsPerPage, reportes.size)
+
     var showDialog by remember { mutableStateOf(false) }
+    var selectedReporte by remember { mutableStateOf<Reporte?>(null) }
 
     Column(
         modifier = Modifier
@@ -727,76 +744,51 @@ fun ContentForPage(items: List<String>, itemsPerPage: Int, currentPage: Int) {
             .border(2.dp, color_component, shape = RoundedCornerShape(8.dp))
     ) {
         for (index in startIndex until endIndex) {
-            Row(modifier = Modifier.fillMaxWidth().clickable {showDialog = true}){
-                Text(text = items[index], modifier = Modifier.padding(8.dp))
+            val reporte = reportes[index]
+
+            // Obtener clave específica para este reporte
+            val clave = obtenerClavePorTipo(reporte.tipo)
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    selectedReporte = reporte
+                    showDialog = true
+                }
+            ) {
+                // Mostrar el valor específico de `parametros` según la clave
+                Text(
+                    text = obtenerParametro(reporte, clave),
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
-    // Componente Modal
-    if (showDialog) {
+
+    // Mostrar el modal solo si hay un reporte seleccionado
+    if (showDialog && selectedReporte != null) {
         AlertDialog(
-            onDismissRequest = {
-                showDialog = false
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Detalle del Reporte") },
+            text = {
+                selectedReporte?.let { reporte ->
+                    // Mostrar detalles del reporte seleccionado
+                    LazyColumn {
+                        item {
+                            MostrarReporte(reporte,reporte.tipo)
+                        }
+                    }
+                }
             },
-            title = {
-                Text(
-                    text = stringResource(R.string.Name_Modal_Report),
-                    color = primary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            },
-
-            text = { Text(
-                text = stringResource(R.string.Content_Modal_Report),
-                color = Color.Gray,
-                modifier = Modifier
-                    .padding(bottom = 6.dp)
-            ) },
-
             confirmButton = {
-                // Usa el botón personalizado dentro del modal
                 ButtonApp(
-                    text = stringResource(R.string.Value_Button_Report),
-                    onClick = {
-                        showDialog = false // Cierra el modal cuando se hace clic en "Aceptar"
-                    },
-                    //modifier = Modifier.fillMaxWidth()
+                    text = "Aceptar",
+                    onClick = { showDialog = false }
                 )
             }
         )
     }
 }
-
-@Composable
-fun PaginationScreen() {
-    var currentPage by remember { mutableStateOf(1) }
-    val itemsPerPage = 5 // Número de elementos por página
-    val items = List(20) { "Item #${it + 1}" } // Lista de ejemplo con 20 elementos
-    val totalPages = (items.size + itemsPerPage - 1) / itemsPerPage // Calcular número de páginas
-
-    Column {
-
-        // Componente de paginación
-        Pagination(
-            totalPages = totalPages,
-            currentPage = currentPage,
-            onPageChanged = { newPage ->
-                currentPage = newPage
-            }
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        // Mostrar contenido según la página actual
-        ContentForPage(items = items, itemsPerPage = itemsPerPage, currentPage = currentPage)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-    }
-}
-
 @Composable
 fun SideBar(
     isVisible: Boolean,
@@ -811,6 +803,7 @@ fun SideBar(
         modifier = Modifier
             .offset(x = offsetX)
             .fillMaxHeight()
+            .statusBarsPadding()
             .width(200.dp)
             .padding(top = 56.dp)
     ) {

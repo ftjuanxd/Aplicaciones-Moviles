@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 fun crearParametrosParaReporte(tipo: String, datos: Map<String, Any?>): Map<String, Any> {
+    println("Creando parámetros para tipo: $tipo con datos: $datos")
     return when (tipo) {
         "Observations" -> {
             mapOf(
@@ -66,6 +67,7 @@ fun MostrarReporte(reporte: Reporte,tipo: String) {
             ordenParametros.forEach { key ->
                 reporte.parametros[key]?.let { value ->
                     Text(text = "$key: $value") // Muestra cada clave y valor en orden específico
+                    //println("Mostrar data \n$key: $value")
                 }
             }
         } else {
@@ -80,14 +82,21 @@ fun formatearFecha(timestamp: Long): String {
     return sdf.format(timestamp)
 }
 fun obtenerParametro(reporte: Reporte, clave: String): String {
-    return reporte.parametros[clave]?.toString() ?: "Parámetro no encontrado"
+    val parametro = reporte.parametros[clave]
+
+    // Agrega un log para verificar qué parámetros están presentes en el reporte
+    //println("Parametros: ${reporte.parametros}")
+
+    return parametro?.toString() ?: "Parámetro no encontrado"
 }
+
 fun obtenerClavePorTipo(tipo: String): String {
+    //println("TIPO De dato $tipo")
     return when (tipo) {
         "Observations" -> "Subject"
         "Personal" -> "Id_placa"
         "Vehicular" -> "Id_placa"
-        "Elementos" -> "Id_placa"
+        "Elemento" -> "Id_placa"
         else -> "unknown"
     }
 }

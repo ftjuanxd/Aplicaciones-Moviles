@@ -121,8 +121,10 @@ fun Components_Profile_Screen(guardiaViewModel: GuardiaViewModel = viewModel()){
         onValueChange = {},
         isEnabled = false
     )
+
+    Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
     // Usamos ButtonApp aquí también
-    ButtonApp(text = stringResource(R.string.Text_profileScreen_Button)) { showDialog = true }
+    // ButtonApp(text = stringResource(R.string.Text_profileScreen_Button)) { showDialog = true }
 
     // Componente Modal
     if (showDialog) {

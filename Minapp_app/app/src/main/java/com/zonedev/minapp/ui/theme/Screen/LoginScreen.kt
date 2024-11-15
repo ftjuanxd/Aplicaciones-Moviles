@@ -60,7 +60,7 @@ fun BlobUi() {
             contentDescription = null,
             contentScale = ContentScale.Crop,
             alignment = Alignment.TopEnd,
-            modifier = Modifier.absoluteOffset(x = (-80).dp, y = (-160).dp)
+            modifier = Modifier.absoluteOffset(x = (-60).dp, y = (-160).dp)
         )
         Text(
             text = stringResource(R.string.blob_ui_text),
@@ -80,6 +80,7 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
     var password by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") } // Variable para el mensaje de error
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -99,7 +100,8 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
             value = password,
             label = stringResource(R.string.Label_name_Input_password),
             onValueChange = { password = it },
-            isEnabled = true
+            isEnabled = true,
+            isPasswordField = true
         )
 
         ButtonApp(stringResource(R.string.name_button_login)) {

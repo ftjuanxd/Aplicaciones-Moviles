@@ -2,6 +2,7 @@ package com.zonedev.minapp.ui.theme.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.zonedev.minapp.ui.theme.Model.Reporte
 import kotlinx.coroutines.launch
@@ -80,6 +81,17 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
+    suspend fun leerReportePorID(reporteId: String): Reporte? {
+        return try {
+            val snapshot = reportesCollection.document(reporteId).get().await()
+            snapshot.toObject(Reporte::class.java)
+        } catch (e: Exception) {
+            println("Error al leer reporte: ${e.message}")
+            null
+        }
+    }
+
+
     suspend fun leerReportesPorGuardiaYTipo(guardiaId: String, tipo: String): List<Reporte> {
         return try {
             val snapshot = reportesCollection
@@ -93,5 +105,38 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
+    suspend fun buscarReportes(
+        guardiaId: String,
+        id: String,
+        nombre: String,
+        tipo: String,
+        fechaInicio: Long?,
+        fechaFin: Long?
+    ): List<Reporte> {
+        return try {
+            var query = reportesCollection.whereEqualTo("guardiaId", guardiaId)
 
+            if (id.isNotEmpty()) {
+                query = query.whereEqualTo(FieldPath.documentId(), id) // Filtrar por ID
+            }
+
+            if (tipo.isNotEmpty()) {
+                query = query.whereEqualTo("tipo", tipo) // Filtrar por tipo
+            }
+
+            if (fechaInicio != null) {
+                query = query.whereGreaterThanOrEqualTo("timestamp", fechaInicio) // Filtrar por fecha de inicio
+            }
+
+            if (fechaFin != null) {
+                query = query.whereLessThanOrEqualTo("timestamp", fechaFin) // Filtrar por fecha de fin
+            }
+
+            val snapshot = query.get().await()
+            snapshot.toObjects(Reporte::class.java)
+        } catch (e: Exception) {
+            println("Error al buscar reportes: ${e.message}")
+            emptyList()
+        }
+    }
 }

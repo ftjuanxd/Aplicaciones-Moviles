@@ -1,13 +1,8 @@
 package com.zonedev.minapp.ui.theme.Components
 
 
-import android.content.ContentValues
-import android.content.Context
+import android.app.DatePickerDialog
 import android.graphics.Bitmap
-import android.net.Uri
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateDpAsState
@@ -77,6 +72,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.Timestamp
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Model.Reporte
 import com.zonedev.minapp.ui.theme.Screen.Chat
@@ -93,7 +89,7 @@ import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
 import com.zonedev.minapp.ui.theme.text
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.Calendar
 import java.util.Locale
 
 @Composable
@@ -289,6 +285,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         label = { Text(text = label, color = color_component) },
         enabled = isEnabled,
+        readOnly = onClick != null,
         modifier = alignmentModifier
             .padding(vertical = 8.dp)
             .border(2.dp, primary, RoundedCornerShape(12.dp))
@@ -333,6 +330,46 @@ fun CustomTextField(
     )
 }
 
+@Composable
+fun DatePickerWithCustomTextField(
+    label: String,
+    initialDate: com.google.firebase.Timestamp?,
+    onDateSelected: (com.google.firebase.Timestamp) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    // Estado para almacenar la fecha seleccionada como texto
+    val selectedDateText = remember { mutableStateOf(initialDate?.let { formatDate(it) } ?: "") }
+
+    // CustomTextField que actúa como gatillo para abrir el DatePickerDialog
+    CustomTextField(
+        value = selectedDateText.value,
+        label = label,
+        onValueChange = { /* El valor no se modifica manualmente */ },
+        onClick = {
+            // Abrir el DatePickerDialog al hacer clic
+            DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    // Actualizar el calendario con la fecha seleccionada
+                    calendar.set(year, month, dayOfMonth, 0, 0, 0)
+                    val timestamp = Timestamp(calendar.time)
+
+                    // Actualizar el estado con la fecha seleccionada
+                    selectedDateText.value = formatDate(timestamp)
+                    // Enviar el valor de la fecha seleccionada a onDateSelected
+                    onDateSelected(timestamp)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        },
+        modifier = modifier
+    )
+}
 
 @Composable
 fun Navbar(
@@ -563,54 +600,6 @@ fun FieldsThemes(destiny:String,onDestinyChange: (String) -> Unit,auto:String,on
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CaptureImageScreen(
-    vals : String = stringResource(R.string.Value_Default_Label_Camera),
-    onImageCaptured: (Uri) -> Unit, // Callback para manejar la URI de la imagen capturada
-) {
-    val context = LocalContext.current
-    val contentResolver = context.contentResolver
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            val uri = createImageFileUri(context)
-            uri?.let {
-                onImageCaptured(it)
-            }
-        }
-    }
-    CustomTextField(
-        value = vals,
-        onValueChange = {},
-        isEnabled = false,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-            .clickable {
-                // Llamar el intent de captura de foto
-                val uri = createImageFileUri(context)
-                if (uri != null) {
-                    takePictureLauncher.launch(uri)
-                }
-            },
-        label = stringResource(R.string.Label_Upload_Files),
-        pdHeight = 120.dp
-    )
-}
-
-private fun createImageFileUri(context: Context): Uri? {
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "new_image.jpg")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
-    }
-    return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewModel()) {
     var selectedOption by remember { mutableStateOf("Personal") }
@@ -619,8 +608,8 @@ fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewMod
     var idFiltro by remember { mutableStateOf("") }
     var nombreFiltro by remember { mutableStateOf("") }
     var tipoFiltro by remember { mutableStateOf(selectedOption) }
-    var fechaInicio by remember { mutableStateOf<Long?>(null) }
-    var fechaFin by remember { mutableStateOf<Long?>(null) }
+    var fechaInicio by remember { mutableStateOf<com.google.firebase.Timestamp?>(null) }
+    var fechaFin by remember { mutableStateOf<com.google.firebase.Timestamp?>(null) }
 
     // Actualizar los reportes cada vez que cambian los filtros
     LaunchedEffect(idFiltro, nombreFiltro, tipoFiltro, fechaInicio, fechaFin) {
@@ -632,6 +621,7 @@ fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewMod
             fechaInicio = fechaInicio,
             fechaFin = fechaFin
         )
+        println(idFiltro)
     }
 
     // Filtros de búsqueda
@@ -689,30 +679,6 @@ fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewMod
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        // Filtro por fecha de inicio
-        CustomTextField(
-            value = fechaInicio?.let { formatDate(it) } ?: "",
-            label = "Fecha de inicio",
-            onValueChange = {
-                fechaInicio = it.toLongOrNull()
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Filtro por fecha de fin
-        CustomTextField(
-            value = fechaFin?.let { formatDate(it) } ?: "",
-            label = "Fecha de fin",
-            onValueChange = {
-                fechaFin = it.toLongOrNull()
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
     }
 
     // Mostrar los reportes filtrados
@@ -725,10 +691,12 @@ fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewMod
     }
 }
 // Función para convertir milisegundos a una fecha legible
-fun formatDate(millis: Long): String {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    return dateFormat.format(Date(millis))
+fun formatDate(timestamp: com.google.firebase.Timestamp): String {
+    val date = timestamp.toDate()
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return dateFormat.format(date)
 }
+
 
 @Composable
 fun Pagination(
@@ -791,7 +759,7 @@ fun Pagination(
 @Composable
 fun PaginationScreen(reportes: List<Reporte>) {
     var currentPage by remember { mutableStateOf(1) }
-    val itemsPerPage = 5
+    val itemsPerPage = 10
     val totalPages = (reportes.size + itemsPerPage - 1) / itemsPerPage
 
     Column {
@@ -867,99 +835,6 @@ fun ContentForPage(reportes: List<Reporte>, itemsPerPage: Int, currentPage: Int)
         )
     }
 }
-
-
-//Filters
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FiltrosDeBusqueda(
-    guardiaId: String,
-    reporteViewModel: ReporteViewModel = viewModel(),
-    onSearch: (String, String, String) -> Unit // Este callback se usará para ejecutar la búsqueda
-) {
-    var idFiltro by remember { mutableStateOf("") }
-    var nombreFiltro by remember { mutableStateOf("") }
-    var tipoFiltro by remember { mutableStateOf("Personal") }
-    val tipos = listOf("Personal", "Vehicular", "Elemento", "Observations")
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        // Filtro por ID
-        CustomTextField(
-            value = idFiltro,
-            label = "ID del Reporte",
-            onValueChange = { idFiltro = it },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Filtro por Nombre
-        CustomTextField(
-            value = nombreFiltro,
-            label = "Nombre del Reporte",
-            onValueChange = { nombreFiltro = it },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Filtro por Tipo
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            var expanded by remember { mutableStateOf(false) }
-            var selectedOption by remember { mutableStateOf(tipoFiltro) }
-
-            Button(
-                onClick = { expanded = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .background(background, RoundedCornerShape(12.dp))
-            ) {
-                Text(text = "Tipo: $selectedOption")
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown",
-                    tint = Color.Black
-                )
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                tipos.forEach { tipo ->
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedOption = tipo
-                            tipoFiltro = tipo
-                            expanded = false
-                        },
-                        text = { Text(text = tipo) }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Botón para realizar la búsqueda
-        Button(
-            onClick = {
-                // Llamamos a la función de búsqueda, pasando los filtros aplicados
-                onSearch(idFiltro, nombreFiltro, tipoFiltro)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Buscar")
-        }
-    }
-}
-
 
 @Composable
 fun SideBar(

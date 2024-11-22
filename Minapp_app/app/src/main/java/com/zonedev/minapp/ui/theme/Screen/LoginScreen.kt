@@ -93,14 +93,12 @@ fun CustomLoginScreen(navController: NavController, auth: FirebaseAuth, onLoginS
             value = email,
             label = stringResource(R.string.Label_name_input_user),
             onValueChange = { if (it.length <= 254) email = it },
-            isEnabled = true
         )
 
         CustomTextField(
             value = password,
             label = stringResource(R.string.Label_name_Input_password),
             onValueChange = { password = it },
-            isEnabled = true,
             isPasswordField = true
         )
 

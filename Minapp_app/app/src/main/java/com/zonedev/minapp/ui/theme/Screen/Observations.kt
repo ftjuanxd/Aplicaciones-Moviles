@@ -60,7 +60,7 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done,
         ),
-        pdHeight = 140.dp
+        pdHeight = 200.dp
     )
     /*CaptureImageScreen("evidencias") { base64Image ->
         // Guarda el string base64 en tu colección de Firestore
@@ -71,17 +71,14 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
     // Usamos ButtonApp aquí también
     ButtonApp(stringResource(R.string.button_submit)) {
         val datos = mapOf(
-            "subject" to subject,
-            "observation" to observation,
-            "evidencias" to  evidencias.toString()
+            "Subject" to subject.lowercase(),
+            "Observation" to observation.lowercase(),
+            "Evidencias" to  evidencias.toString()
         )
 
         val parametros = crearParametrosParaReporte(tipo_report, datos)
 
         reporteViewModel.crearReporte(tipo_report,parametros,guardiaId)
-        subject = ""
-        observation = ""
-        evidencias = null
         showDialog = true
     }
 
@@ -91,6 +88,9 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
         AlertDialog(
             onDismissRequest = {
                 showDialog = false
+                subject = ""
+                observation = ""
+                evidencias = null
             },
             title = { Text(
                 text = stringResource(R.string.Name_Modal_Report),
@@ -112,6 +112,9 @@ fun Components_Observations(guardiaId: String,reporteViewModel: ReporteViewModel
                     text = stringResource(R.string.Value_Button_Report),
                     onClick = {
                         showDialog = false // Cierra el modal cuando se hace clic en "Aceptar"
+                        subject = ""
+                        observation = ""
+                        evidencias = null
                     },
                     //modifier = Modifier.fillMaxWidth()
                 )

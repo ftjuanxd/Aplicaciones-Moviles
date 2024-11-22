@@ -2,6 +2,7 @@ package com.zonedev.minapp.ui.theme.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.zonedev.minapp.ui.theme.Model.Reporte
 import kotlinx.coroutines.launch
@@ -80,6 +81,17 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
+    suspend fun leerReportePorID(reporteId: String): Reporte? {
+        return try {
+            val snapshot = reportesCollection.document(reporteId).get().await()
+            snapshot.toObject(Reporte::class.java)
+        } catch (e: Exception) {
+            println("Error al leer reporte: ${e.message}")
+            null
+        }
+    }
+
+
     suspend fun leerReportesPorGuardiaYTipo(guardiaId: String, tipo: String): List<Reporte> {
         return try {
             val snapshot = reportesCollection
@@ -93,5 +105,42 @@ class ReporteViewModel : ViewModel() {
         }
     }
 
+    suspend fun buscarReportes(
+        guardiaId: String,
+        id: String,
+        nombre: String,
+        tipo: String,
+        fechaInicio: Timestamp?,
+        fechaFin: Timestamp?
+    ): List<Reporte> {
+        return try {
+            var query = reportesCollection.whereEqualTo("guardiaId", guardiaId)
+
+            if (tipo.isNotEmpty()) {
+                query = query.whereEqualTo("tipo", tipo) // Filtrar por tipo
+            }
+
+            if (id.isNotEmpty()) {
+                query = query.whereEqualTo("parametros.Id_placa", id) // Filtrar por ID
+            }
+
+            if (nombre.isNotEmpty()) {
+                query = reportesCollection
+                    .whereGreaterThanOrEqualTo("parametros.Name",nombre)
+                    .whereLessThan("parametros.Name","${nombre}\uF8FF") // Filtrar por nombre (asegúrate de que el campo existe)
+            }
+
+            if (fechaInicio != null && fechaFin != null) {
+                query = reportesCollection
+                    .whereGreaterThanOrEqualTo("timestamp", fechaInicio)
+                    .whereLessThanOrEqualTo("timestamp", fechaFin)
+            }
+            val snapshot = query.get().await()
+            snapshot.toObjects(Reporte::class.java)
+        } catch (e: Exception) {
+            println("Error al buscar reportes: ${e.message}")
+            emptyList()
+        }
+    }
 
 }

@@ -26,6 +26,7 @@ import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.ViewModel.ReporteViewModel
 import com.zonedev.minapp.ui.theme.primary
 
+/**
 @Composable
 fun Template_Scan(IsScreenElement: Boolean=false,vals:String = stringResource(R.string.Value_Default_Label_Camera),guardiaId: String){
 
@@ -48,7 +49,7 @@ fun Template_Scan(IsScreenElement: Boolean=false,vals:String = stringResource(R.
         //Componentes
         Components_Template(guardiaId = guardiaId)
     }
-}
+}**/
 
 @Composable
 fun Template_Text(
@@ -61,11 +62,11 @@ fun Template_Text(
     var Id by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
 
-    if (IsScreenElement) {
+    /**if (IsScreenElement) {
         CaptureImageScreen(stringResource(R.string.Value_Label_Element)) { base64Image ->
             // Manejar la imagen capturada
         }
-    }
+    }**/
 
     CustomTextField(
         value = Id,
@@ -146,20 +147,20 @@ fun Components_Template(
                     onClick = {
                         val datos = if (tipo_report != "Elemento") {
                             mapOf(
-                                "Id_placa" to Id,
-                                "Name" to name,
-                                "Destino" to destiny,
-                                "Autorizacion" to auto,
-                                "Descripcion" to descrip
+                                "Id_placa" to Id.lowercase(),
+                                "Name" to name.lowercase(),
+                                "Destino" to destiny.lowercase(),
+                                "Autorizacion" to auto.lowercase(),
+                                "Descripcion" to descrip.lowercase()
                             )
                         } else {
                             mapOf(
                                 "Imgelement" to "",
-                                "Id_placa" to Id,
-                                "Name" to name,
-                                "Destino" to destiny,
-                                "Autorizacion" to auto,
-                                "Descripcion" to descrip
+                                "Id_placa" to Id.lowercase(),
+                                "Name" to name.lowercase(),
+                                "Destino" to destiny.lowercase(),
+                                "Autorizacion" to auto.lowercase(),
+                                "Descripcion" to descrip.lowercase()
                             )
                         }
 

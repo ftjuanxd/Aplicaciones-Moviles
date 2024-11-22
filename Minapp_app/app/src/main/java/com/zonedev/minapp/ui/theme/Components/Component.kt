@@ -1,13 +1,8 @@
 package com.zonedev.minapp.ui.theme.Components
 
 
-import android.content.ContentValues
-import android.content.Context
+import android.app.DatePickerDialog
 import android.graphics.Bitmap
-import android.net.Uri
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateDpAsState
@@ -69,12 +64,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.Timestamp
 import com.zonedev.minapp.R
 import com.zonedev.minapp.ui.theme.Model.Reporte
 import com.zonedev.minapp.ui.theme.Screen.Chat
@@ -89,6 +87,10 @@ import com.zonedev.minapp.ui.theme.ViewModel.ReporteViewModel
 import com.zonedev.minapp.ui.theme.background
 import com.zonedev.minapp.ui.theme.color_component
 import com.zonedev.minapp.ui.theme.primary
+import com.zonedev.minapp.ui.theme.text
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun BaseScreen(
@@ -265,40 +267,49 @@ fun CustomTextField(
     pdHeight: Dp? = null,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    bitmap: Bitmap? = null, // Imagen capturada
-    isUser: Boolean? = null // Nuevo parámetro opcional
+    bitmap: Bitmap? = null,
+    isUser: Boolean? = null,
+    isPasswordField: Boolean = false // Nuevo parámetro para indicar si es un campo de contraseña
 ) {
-    // Determinamos la alineación según isUser
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    // Determina la alineación según isUser
     val alignmentModifier = when (isUser) {
-        true -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.End) // Alineado a la derecha si es del usuario
-        false -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.Start) // Alineado a la izquierda si no es del usuario
-        else -> Modifier.fillMaxWidth() // Alineado por defecto si no se pasa ningún valor
+        true -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)
+        false -> Modifier.fillMaxWidth().wrapContentWidth(Alignment.Start)
+        else -> Modifier.fillMaxWidth()
     }
-    // Aplicamos el modifier junto con el nuevo alignmentModifier
+
     TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label,color= color_component) },
+        label = { Text(text = label, color = color_component) },
         enabled = isEnabled,
+        readOnly = onClick != null,
         modifier = alignmentModifier
-            //.then(modifier) // Se combina el alignmentModifier con el resto del modifier pasado
             .padding(vertical = 8.dp)
             .border(2.dp, primary, RoundedCornerShape(12.dp))
             .let { if (pdHeight != null) it.height(pdHeight) else it }
             .clickable {
                 onClick?.invoke()
             },
-        keyboardOptions = keyboardOptions,
+        visualTransformation = if (isPasswordField && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = if (isPasswordField) KeyboardOptions(keyboardType = KeyboardType.Password) else keyboardOptions,
         trailingIcon = {
             if (bitmap != null) {
-                // Mostrar la imagen capturada dentro del TextField
                 Image(
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier.size(40.dp)
                 )
+            } else if (isPasswordField) {
+                // Alterna entre "Mostrar" y "Ocultar"
+                Text(
+                    text = if (passwordVisible) "Ocultar" else "Mostrar",
+                    color = iconTint ?: Color.Black,
+                    modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+                )
             } else if (trailingIcon != null) {
-                // Mostrar el ícono habitual si no hay imagen
                 Icon(
                     painter = painterResource(id = trailingIcon),
                     contentDescription = null,
@@ -312,8 +323,51 @@ fun CustomTextField(
             focusedIndicatorColor = Color.Transparent,
             disabledLabelColor = Color.Transparent,
             containerColor = background,
-            disabledTextColor = MaterialTheme.colorScheme.onSurface
+            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = text,
+            focusedTextColor = text
         )
+    )
+}
+
+@Composable
+fun DatePickerWithCustomTextField(
+    label: String,
+    initialDate: com.google.firebase.Timestamp?,
+    onDateSelected: (com.google.firebase.Timestamp) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    // Estado para almacenar la fecha seleccionada como texto
+    val selectedDateText = remember { mutableStateOf(initialDate?.let { formatDate(it) } ?: "") }
+
+    // CustomTextField que actúa como gatillo para abrir el DatePickerDialog
+    CustomTextField(
+        value = selectedDateText.value,
+        label = label,
+        onValueChange = { /* El valor no se modifica manualmente */ },
+        onClick = {
+            // Abrir el DatePickerDialog al hacer clic
+            DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    // Actualizar el calendario con la fecha seleccionada
+                    calendar.set(year, month, dayOfMonth, 0, 0, 0)
+                    val timestamp = Timestamp(calendar.time)
+
+                    // Actualizar el estado con la fecha seleccionada
+                    selectedDateText.value = formatDate(timestamp)
+                    // Enviar el valor de la fecha seleccionada a onDateSelected
+                    onDateSelected(timestamp)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        },
+        modifier = modifier
     )
 }
 
@@ -391,6 +445,7 @@ fun Navbar(
 @Composable
 fun ButtonApp(
     text: String,
+    iconButton: Boolean? = false,
     onClick: () -> Unit,
     //modifier: Modifier = Modifier solo si el diseno base no ocupa todo el espacio del modal
 ) {
@@ -403,6 +458,13 @@ fun ButtonApp(
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(text = text, color = Color.White, fontSize = 18.sp)
+        if (iconButton == true) {
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "Dropdown",
+                tint = Color.White,
+            )
+        }
     }
 }
 
@@ -538,112 +600,89 @@ fun FieldsThemes(destiny:String,onDestinyChange: (String) -> Unit,auto:String,on
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CaptureImageScreen(
-    vals : String = stringResource(R.string.Value_Default_Label_Camera),
-    onImageCaptured: (Uri) -> Unit, // Callback para manejar la URI de la imagen capturada
-) {
-    val context = LocalContext.current
-    val contentResolver = context.contentResolver
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            val uri = createImageFileUri(context)
-            uri?.let {
-                onImageCaptured(it)
-            }
-        }
-    }
-    CustomTextField(
-        value = vals,
-        onValueChange = {},
-        isEnabled = false,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-            .clickable {
-                // Llamar el intent de captura de foto
-                val uri = createImageFileUri(context)
-                if (uri != null) {
-                    takePictureLauncher.launch(uri)
-                }
-            },
-        label = stringResource(R.string.Label_Upload_Files),
-        pdHeight = 120.dp
-    )
-}
-
-private fun createImageFileUri(context: Context): Uri? {
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "new_image.jpg")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
-    }
-    return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewModel()) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Pedestrian Access") }
+    var selectedOption by remember { mutableStateOf("Personal") }
     val options = listOf("Personal", "Vehicular", "Elemento", "Observations")
-    var reportes by remember { mutableStateOf(emptyList<Reporte>()) } // Lista de reportes
+    var reportes by remember { mutableStateOf(emptyList<Reporte>()) }
+    var idFiltro by remember { mutableStateOf("") }
+    var nombreFiltro by remember { mutableStateOf("") }
+    var tipoFiltro by remember { mutableStateOf(selectedOption) }
+    var fechaInicio by remember { mutableStateOf<com.google.firebase.Timestamp?>(null) }
+    var fechaFin by remember { mutableStateOf<com.google.firebase.Timestamp?>(null) }
 
-    // Actualizar la lista de reportes cada vez que cambia la opción seleccionada
-    LaunchedEffect(selectedOption) {
-        reportes = reporteViewModel.leerReportesPorGuardiaYTipo(guardiaId, selectedOption)
+    // Actualizar los reportes cada vez que cambian los filtros
+    LaunchedEffect(idFiltro, nombreFiltro, tipoFiltro, fechaInicio, fechaFin) {
+        reportes = reporteViewModel.buscarReportes(
+            guardiaId = guardiaId,
+            id = idFiltro,
+            nombre = nombreFiltro,
+            tipo = tipoFiltro,
+            fechaInicio = fechaInicio,
+            fechaFin = fechaFin
+        )
+        println(idFiltro)
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(background),
-        contentAlignment = Alignment.Center
-    ) {
-        Button(
-            onClick = { expanded = true },
-            colors = ButtonDefaults.buttonColors(containerColor = primary),
-            modifier = Modifier
-                .wrapContentWidth()
-                .align(alignment = Alignment.Center)
-                .padding(end = 16.dp, start = 16.dp),
+    // Filtros de búsqueda
+    Column(modifier = Modifier.padding(10.dp)) {
+        // Filtro por Tipo
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
-            Text(text = selectedOption, color = background)
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = "Dropdown",
-                tint = background
-            )
-        }
+            var expandedTipo by remember { mutableStateOf(false) }
+            var selectedTipo by remember { mutableStateOf(tipoFiltro) }
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .width(380.dp)
-                .padding(12.dp)
-                .align(alignment = Alignment.Center)
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(text = option) },
-                    onClick = {
-                        selectedOption = option
-                        expanded = false
-                    }
-                )
+            ButtonApp(
+                text = "$selectedTipo",
+                iconButton = true,
+            ) {
+                expandedTipo = true
+            }
+
+            DropdownMenu(
+                expanded = expandedTipo,
+                onDismissRequest = { expandedTipo = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                options.forEach { tipo ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedTipo = tipo
+                            tipoFiltro = tipo
+                            expandedTipo = false
+                        },
+                        text = { Text(text = tipo) }
+                    )
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        CustomTextField(
+            value = idFiltro,
+            label = "ID del Usuario",
+            onValueChange = { idFiltro = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp ))
+
+        CustomTextField(
+            value = nombreFiltro,
+            label = "Nombre del Usuario",
+            onValueChange = { nombreFiltro = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
     }
 
-    Separetor()
+    // Mostrar los reportes filtrados
     Spacer(modifier = Modifier.height(20.dp))
-
-    // Mostrar contenido de reportes de acuerdo con la opción seleccionada
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -651,6 +690,13 @@ fun DropdownMenu(guardiaId: String, reporteViewModel: ReporteViewModel = viewMod
         PaginationScreen(reportes)
     }
 }
+// Función para convertir milisegundos a una fecha legible
+fun formatDate(timestamp: com.google.firebase.Timestamp): String {
+    val date = timestamp.toDate()
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return dateFormat.format(date)
+}
+
 
 @Composable
 fun Pagination(
@@ -713,7 +759,7 @@ fun Pagination(
 @Composable
 fun PaginationScreen(reportes: List<Reporte>) {
     var currentPage by remember { mutableStateOf(1) }
-    val itemsPerPage = 5
+    val itemsPerPage = 10
     val totalPages = (reportes.size + itemsPerPage - 1) / itemsPerPage
 
     Column {
@@ -789,6 +835,7 @@ fun ContentForPage(reportes: List<Reporte>, itemsPerPage: Int, currentPage: Int)
         )
     }
 }
+
 @Composable
 fun SideBar(
     isVisible: Boolean,

@@ -12,7 +12,7 @@ Ubiqo
 Esta app ofrece lo mismo que mi idea principal, no obstante esta fue creada para un publico general siendo que la mia seria una app especializada para la empresa que la desee comprar, siendo en si la diferencia clave la interfaz del usuario y una que otra funcion dependiendo del cargo o rango de la persona que la empresa decida.
 
 ## Restricciones Tecnicas
-1. Esta aplicacion funcionara en dispositivos Android con sistema operativo version 9 o superior
+1. Esta aplicacion funcionara en dispositivos Android con sistema operativo version 7 o superior
 2. La informacion de esta aplicacion sera guardad en una base de datos y protegida para evitar el escape de la informacion
 
 ## Funcionalidades del Usuario:
